@@ -1,44 +1,146 @@
-import { Image, StyleSheet, Platform } from 'react-native';
-
-import { HelloWave } from '@/components/HelloWave';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
+import React from 'react';
+import { SafeAreaView, StyleSheet, Text, View, FlatList } from 'react-native';
+import dayjs from 'dayjs';
+import { mockUserData, TransactionType } from '@/mockData';
+import { IconSymbol } from '@/components/ui/IconSymbol';
+import { Link } from 'expo-router';
 
 export default function HomeScreen() {
+  const { balance, transactions } = mockUserData.user;
+
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }
-    >
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-    </ParallaxScrollView>
+    <SafeAreaView style={styles.container}>
+      <View style={styles.container}>
+        {/* Header Section */}
+        <View style={styles.headerContainer}>
+          <View>
+            <Text style={styles.balance}>RM{balance.toFixed(2)}</Text>
+            <Text style={styles.desc}>Total Balance</Text>
+          </View>
+        </View>
+
+        {/* CTA Buttons */}
+        <View style={styles.ctaContainer}>
+          <View style={styles.ctaBox}>
+            <View style={styles.ctaItem}>
+              <IconSymbol name="plus" size={24} color="black" />
+              <Text style={styles.ctaText}>Add Money</Text>
+            </View>
+            <Link href="/send-money">
+              <View style={styles.ctaItem}>
+                <IconSymbol name="paperplane.fill" size={24} color="black" />
+                <Text style={styles.ctaText}>Send Money</Text>
+              </View>
+            </Link>
+          </View>
+        </View>
+
+        {/* Transaction History */}
+        <View style={styles.transactionContainer}>
+          <Text style={styles.sectionTitle}>Transaction History</Text>
+          <FlatList
+            data={transactions}
+            keyExtractor={item => item.id.toString()}
+            renderItem={({ item }) => (
+              <View style={styles.transactionItem}>
+                <View>
+                  <Text style={styles.transactionType}>{item.type}</Text>
+                  <Text style={styles.transactionDate}>
+                    {dayjs(item.createdAt).format('DD MMM YYYY, hh:mm A')}
+                  </Text>
+                </View>
+                <Text
+                  style={[
+                    styles.transactionAmount,
+                    {
+                      color: [TransactionType.RECEIVE_MONEY, TransactionType.TOP_UP].includes(
+                        item.type,
+                      )
+                        ? 'green'
+                        : 'red',
+                    },
+                  ]}
+                >
+                  {[TransactionType.RECEIVE_MONEY, TransactionType.TOP_UP].includes(item.type)
+                    ? '+'
+                    : '-'}{' '}
+                  RM{item.amount.toFixed(2)}
+                </Text>
+              </View>
+            )}
+          />
+        </View>
+      </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
+  container: {
+    flex: 1,
+    backgroundColor: '#f6efec',
+    padding: 20,
+  },
+  headerContainer: {
     flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
-    gap: 8,
+    marginBottom: 20,
   },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
+  balance: {
+    fontSize: 24,
+    fontWeight: 'bold',
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
+  desc: {
+    fontSize: 16,
+    marginTop: 4,
+    color: 'gray',
+  },
+  ctaContainer: {
+    marginBottom: 20,
+  },
+  ctaBox: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    backgroundColor: 'white',
+    padding: 15,
+    borderRadius: 10,
+    elevation: 2,
+  },
+  ctaItem: {
+    alignItems: 'center',
+  },
+  ctaText: {
+    marginTop: 5,
+    fontSize: 14,
+  },
+  transactionContainer: {
+    flex: 1,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
+  transactionItem: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    backgroundColor: 'white',
+    padding: 15,
+    borderRadius: 10,
+    marginBottom: 10,
+    elevation: 2,
+  },
+  transactionType: {
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  transactionDate: {
+    fontSize: 14,
+    color: 'gray',
+  },
+  transactionAmount: {
+    fontSize: 16,
+    fontWeight: 'bold',
   },
 });
