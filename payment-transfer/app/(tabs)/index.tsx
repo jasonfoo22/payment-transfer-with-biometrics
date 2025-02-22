@@ -4,83 +4,77 @@ import dayjs from 'dayjs';
 import { mockUserData, TransactionType } from '@/mockData';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import { Link } from 'expo-router';
+import { ContentLayoutView } from '@/components/ContentLayoutView';
 
 export default function HomeScreen() {
   const { balance, transactions } = mockUserData.user;
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.container}>
-        {/* Header Section */}
-        <View style={styles.headerContainer}>
-          <View>
-            <Text style={styles.balance}>RM{balance.toFixed(2)}</Text>
-            <Text style={styles.desc}>Total Balance</Text>
-          </View>
-        </View>
-
-        {/* CTA Buttons */}
-        <View style={styles.ctaContainer}>
-          <View style={styles.ctaBox}>
-            <View style={styles.ctaItem}>
-              <IconSymbol name="plus" size={24} color="black" />
-              <Text style={styles.ctaText}>Add Money</Text>
-            </View>
-            <Link href="/send-money">
-              <View style={styles.ctaItem}>
-                <IconSymbol name="paperplane.fill" size={24} color="black" />
-                <Text style={styles.ctaText}>Send Money</Text>
-              </View>
-            </Link>
-          </View>
-        </View>
-
-        {/* Transaction History */}
-        <View style={styles.transactionContainer}>
-          <Text style={styles.sectionTitle}>Transaction History</Text>
-          <FlatList
-            data={transactions}
-            keyExtractor={item => item.id.toString()}
-            renderItem={({ item }) => (
-              <View style={styles.transactionItem}>
-                <View>
-                  <Text style={styles.transactionType}>{item.type}</Text>
-                  <Text style={styles.transactionDate}>
-                    {dayjs(item.createdAt).format('DD MMM YYYY, hh:mm A')}
-                  </Text>
-                </View>
-                <Text
-                  style={[
-                    styles.transactionAmount,
-                    {
-                      color: [TransactionType.RECEIVE_MONEY, TransactionType.TOP_UP].includes(
-                        item.type,
-                      )
-                        ? 'green'
-                        : 'red',
-                    },
-                  ]}
-                >
-                  {[TransactionType.RECEIVE_MONEY, TransactionType.TOP_UP].includes(item.type)
-                    ? '+'
-                    : '-'}{' '}
-                  RM{item.amount.toFixed(2)}
-                </Text>
-              </View>
-            )}
-          />
+    <ContentLayoutView>
+      {/* Header Section */}
+      <View style={styles.headerContainer}>
+        <View>
+          <Text style={styles.balance}>RM{balance.toFixed(2)}</Text>
+          <Text style={styles.desc}>Total Balance</Text>
         </View>
       </View>
-    </SafeAreaView>
+
+      {/* CTA Buttons */}
+      <View style={styles.ctaContainer}>
+        <View style={styles.ctaBox}>
+          <View style={styles.ctaItem}>
+            <IconSymbol name="plus" size={24} color="black" />
+            <Text style={styles.ctaText}>Add Money</Text>
+          </View>
+          <Link href="/selectContactScreen">
+            <View style={styles.ctaItem}>
+              <IconSymbol name="paperplane.fill" size={24} color="black" />
+              <Text style={styles.ctaText}>Send Money</Text>
+            </View>
+          </Link>
+        </View>
+      </View>
+
+      {/* Transaction History */}
+      <View style={styles.transactionContainer}>
+        <Text style={styles.sectionTitle}>Transaction History</Text>
+        <FlatList
+          data={transactions}
+          keyExtractor={item => item.id.toString()}
+          renderItem={({ item }) => (
+            <View style={styles.transactionItem}>
+              <View>
+                <Text style={styles.transactionType}>{item.type}</Text>
+                <Text style={styles.transactionDate}>
+                  {dayjs(item.createdAt).format('DD MMM YYYY, hh:mm A')}
+                </Text>
+              </View>
+              <Text
+                style={[
+                  styles.transactionAmount,
+                  {
+                    color: [TransactionType.RECEIVE_MONEY, TransactionType.TOP_UP].includes(
+                      item.type,
+                    )
+                      ? 'green'
+                      : 'red',
+                  },
+                ]}
+              >
+                {[TransactionType.RECEIVE_MONEY, TransactionType.TOP_UP].includes(item.type)
+                  ? '+'
+                  : '-'}{' '}
+                RM{item.amount.toFixed(2)}
+              </Text>
+            </View>
+          )}
+        />
+      </View>
+    </ContentLayoutView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#f6efec',
-    padding: 20,
-  },
   headerContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
