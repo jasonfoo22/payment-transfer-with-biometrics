@@ -19,11 +19,10 @@ export default function SendMoneyScreen() {
   const [notes, setNotes] = useState('');
   const [error, setError] = useState<{ amount?: string }>({});
 
-  // Handle Send Money
+  // Handle Submit Money
   const handleSendMoney = () => {
     let errors: { amount?: string } = {};
     if (!amount) errors.amount = 'Amount is required';
-    if (!receiverName || !phoneNumber) errors.amount = 'Receiver information is missing';
 
     setError(errors);
     if (Object.keys(errors).length > 0) return;
@@ -31,21 +30,9 @@ export default function SendMoneyScreen() {
     router.back();
   };
 
-  const handleAmountChange = (text: string) => {
-    // Remove non-numeric characters
-    const cleaned = text.replace(/\D/g, '');
-
-    // If empty, reset to empty string
-    if (cleaned === '') {
-      setAmount('');
-      return;
-    }
-
-    // Convert to cents, then format as currency
-    const numericValue = parseInt(cleaned, 10);
-    const formattedAmount = (numericValue / 100).toFixed(2);
-
-    setAmount(formattedAmount);
+  const handleAmountChange = (value: string) => {
+    const numericValue = parseInt(value.replace(/\D/g, ''), 10) || 0;
+    setAmount((numericValue / 100).toFixed(2));
   };
 
   return (
@@ -72,12 +59,15 @@ export default function SendMoneyScreen() {
               <View style={styles.amountInputWrapper}>
                 <Text style={styles.amountCurrencyText}>RM</Text>
                 <TextInput
-                  style={[styles.amountInput, error.amount ? styles.inputError : null]}
+                  style={[styles.amountInput, error.amount && styles.inputError]}
                   placeholder="0.00"
                   keyboardType="numeric"
+                  inputMode="decimal"
                   value={amount}
                   onChangeText={handleAmountChange}
                   maxLength={10}
+                  returnKeyType="done"
+                  autoFocus
                 />
               </View>
               {error.amount && <Text style={styles.errorText}>{error.amount}</Text>}
@@ -93,6 +83,8 @@ export default function SendMoneyScreen() {
                 value={notes}
                 onChangeText={setNotes}
                 multiline
+                maxLength={100}
+                numberOfLines={3}
               />
             </View>
           </View>

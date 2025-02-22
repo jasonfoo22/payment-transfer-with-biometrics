@@ -31,7 +31,7 @@ export type User = {
 export const mockUserData: { user: User } = {
   user: {
     id: 1,
-    name: 'John Doe',
+    name: 'Jason Foo',
     balance: 5100.4,
     transactions: [
       {
