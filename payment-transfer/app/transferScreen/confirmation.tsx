@@ -81,8 +81,10 @@ export default function Confirmation() {
               <Text style={styles.phoneNumber}>{phone}</Text>
             </View>
           </View>
-          <Text style={styles.label}>Amount:</Text>
-          <Text style={styles.amount}>RM {amount}</Text>
+          <View>
+            <Text style={styles.label}>Amount:</Text>
+            <Text style={styles.amount}>RM {amount}</Text>
+          </View>
 
           {notes && (
             <View>

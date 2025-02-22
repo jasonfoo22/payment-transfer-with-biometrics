@@ -1,25 +1,37 @@
-import React from 'react';
-import { SafeAreaView, StyleSheet, Text, View, FlatList } from 'react-native';
+import React, { useState } from 'react';
+import { StyleSheet, Text, View, FlatList, TouchableOpacity } from 'react-native';
 import dayjs from 'dayjs';
-import { mockUserData, TransactionType } from '@/mockData';
+import { mockUserData } from '@/mockData';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import { Link } from 'expo-router';
 import { ContentLayoutView } from '@/components/ContentLayoutView';
+import { TransactionType } from '@/interface/transaction';
+import { Colors } from '@/constants/Colors';
 
 export default function HomeScreen() {
   const { balance, transactions } = mockUserData.user;
+  const [isBalanceHidden, setIsBalanceHidden] = useState(false);
 
   return (
     <ContentLayoutView>
-      {/* Header Section */}
       <View style={styles.headerContainer}>
         <View>
-          <Text style={styles.balance}>RM{balance.toFixed(2)}</Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+            <Text style={styles.balance}>
+              {isBalanceHidden ? '*****' : `RM${balance.toFixed(2)}`}
+            </Text>
+            <TouchableOpacity onPress={() => setIsBalanceHidden(prev => !prev)}>
+              <IconSymbol
+                name={isBalanceHidden ? 'eye.slash' : 'eye'}
+                size={24}
+                color={Colors.light.icon}
+              />
+            </TouchableOpacity>
+          </View>
           <Text style={styles.desc}>Total Balance</Text>
         </View>
       </View>
 
-      {/* CTA Buttons */}
       <View style={styles.ctaContainer}>
         <View style={styles.ctaBox}>
           <View style={styles.ctaItem}>
@@ -35,16 +47,16 @@ export default function HomeScreen() {
         </View>
       </View>
 
-      {/* Transaction History */}
       <View style={styles.transactionContainer}>
         <Text style={styles.sectionTitle}>Transaction History</Text>
         <FlatList
           data={transactions}
-          keyExtractor={item => item.id.toString()}
+          keyExtractor={item => item._id}
           renderItem={({ item }) => (
             <View style={styles.transactionItem}>
               <View>
                 <Text style={styles.transactionType}>{item.type}</Text>
+                <Text style={styles.transactionReceiver}>{item.receiverName}</Text>
                 <Text style={styles.transactionDate}>
                   {dayjs(item.createdAt).format('DD MMM YYYY, hh:mm A')}
                 </Text>
@@ -64,7 +76,8 @@ export default function HomeScreen() {
                 {[TransactionType.RECEIVE_MONEY, TransactionType.TOP_UP].includes(item.type)
                   ? '+'
                   : '-'}{' '}
-                RM{item.amount.toFixed(2)}
+                RM
+                {item.amount.toFixed(2)}
               </Text>
             </View>
           )}
@@ -124,6 +137,11 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     marginBottom: 10,
     elevation: 2,
+  },
+  transactionReceiver: {
+    fontSize: 14,
+    color: '#555',
+    marginVertical: 2,
   },
   transactionType: {
     fontSize: 16,

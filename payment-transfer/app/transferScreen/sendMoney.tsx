@@ -29,8 +29,6 @@ export default function SendMoneyScreen() {
     setError(errors);
     if (Object.keys(errors).length > 0) return;
 
-    console.log(receiverName, '>> receiverName');
-
     router.push({
       pathname: '/transferScreen/confirmation',
       params: { name: receiverName, phone: phoneNumber, amount, notes },

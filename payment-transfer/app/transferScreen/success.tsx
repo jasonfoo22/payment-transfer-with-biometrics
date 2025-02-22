@@ -1,5 +1,4 @@
-import React, { useEffect } from 'react';
-import { StyleSheet, Text, View, Image } from 'react-native';
+import { StyleSheet, Text, View, Image, TouchableOpacity } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { ContentLayoutView } from '@/components/ContentLayoutView';
 import { IconSymbol } from '@/components/ui/IconSymbol';
@@ -7,33 +6,47 @@ import { Colors } from '@/constants/Colors';
 
 export default function SuccessScreen() {
   const router = useRouter();
-  const { name, phone, amount } = useLocalSearchParams<{
+  const {
+    name = 'Unknown',
+    phone = 'N/A',
+    amount = '0.00',
+  } = useLocalSearchParams<{
     name: string;
     phone: string;
     amount: string;
   }>();
 
-  // useEffect(() => {
-  //   const timer = setTimeout(() => {
-  //     router.replace('/'); // Navigate back to home or another relevant screen
-  //   }, 3000);
-  //
-  //   return () => clearTimeout(timer);
-  // }, []);
+  const backToHome = () => {
+    router.push({
+      pathname: '/',
+    });
+  };
 
   return (
     <ContentLayoutView>
       <View style={styles.container}>
-        <View style={styles.container}>
-          <IconSymbol name="checkmark" size={18} weight="medium" />
-
-          {/*<Image source={require('@/assets/images/rytBlueLogo.png')} style={styles.successImage} />*/}
+        <View style={styles.successWrapper}>
+          <View style={styles.checkMarkIconWrapper}>
+            <IconSymbol name="checkmark" size={40} weight="medium" color={Colors.success} />
+          </View>
         </View>
-        <Text style={styles.successText}>Transaction Successful!</Text>
-        <Text style={styles.amount}>RM 28.80</Text>
-        <Text style={styles.details}>Jason Foo (01116558920)</Text>
-        <Text style={styles.info}>Redirecting to home...</Text>
+        <Text style={styles.successText}>Transaction Successful</Text>
+        <Text style={styles.successTextAmount}>RM {amount}</Text>
+        <View style={styles.receiverContainer}>
+          <Image
+            source={require('@/assets/images/duitnowlogo.png')}
+            style={styles.logo}
+            resizeMode="contain"
+          />
+          <View style={styles.receiverInfoWrapper}>
+            <Text style={styles.receiverName}>{name}</Text>
+            <Text style={styles.phoneNumber}>{phone}</Text>
+          </View>
+        </View>
       </View>
+      <TouchableOpacity style={styles.homeBtn} onPress={backToHome}>
+        <Text style={styles.homeText}>Back to Home</Text>
+      </TouchableOpacity>
     </ContentLayoutView>
   );
 }
@@ -45,6 +58,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 16,
   },
+  successWrapper: {
+    marginBottom: 20,
+  },
   successImage: {
     width: 200,
     height: 100,
@@ -52,20 +68,62 @@ const styles = StyleSheet.create({
   successText: {
     fontSize: 22,
     fontWeight: 'bold',
-    color: '#4CAF50',
+    color: Colors.primary,
   },
-  amount: {
-    fontSize: 26,
+  successTextAmount: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: '#5E72E4',
+  },
+  checkMarkIconWrapper: {
+    color: Colors.success,
+    borderWidth: 3,
+    borderRadius: 50,
+    borderColor: Colors.success,
+    padding: 16,
+    elevation: 5,
+    shadowColor: 'rgba(0, 0, 0, 0.2)',
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+  },
+  receiverContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  receiverInfoWrapper: {
+    marginLeft: 10,
+    gap: 4,
+  },
+  logo: {
+    width: 45,
+    height: 45,
+  },
+  receiverName: {
+    fontSize: 18,
     fontWeight: 'bold',
     color: '#333',
   },
-  details: {
-    fontSize: 18,
-    color: '#666',
+  phoneNumber: {
+    fontSize: 16,
+    color: 'gray',
   },
-  info: {
-    fontSize: 14,
-    color: '#aaa',
-    marginTop: 10,
+  homeBtn: {
+    backgroundColor: '#5E72E4',
+    paddingVertical: 15,
+    borderRadius: 12,
+    alignItems: 'center',
+    elevation: 3,
+    boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.2)',
+    marginHorizontal: 20,
+  },
+  homeText: {
+    fontSize: 16,
+    fontWeight: 600,
+    color: '#fff',
+    textTransform: 'uppercase',
   },
 });
