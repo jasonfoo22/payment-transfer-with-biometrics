@@ -34,8 +34,10 @@ export default function RootLayout() {
         <Stack.Screen name="loginLoading" options={{ headerShown: false }} />
         <Stack.Screen name="login" options={{ headerShown: false }} />
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="sendMoney" options={{ headerShown: false }} />
-        <Stack.Screen name="selectContactScreen" options={{ headerShown: false }} />
+        <Stack.Screen name="transferScreen/sendMoney" options={{ headerShown: false }} />
+        <Stack.Screen name="transferScreen/selectContact" options={{ headerShown: false }} />
+        <Stack.Screen name="transferScreen/confirmation" options={{ headerShown: false }} />
+        <Stack.Screen name="transferScreen/success" options={{ headerShown: false }} />
         <Stack.Screen name="+not-found" />
       </Stack>
       <StatusBar style="auto" />

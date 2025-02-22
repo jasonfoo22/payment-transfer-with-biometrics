@@ -26,7 +26,7 @@ export default function HomeScreen() {
             <IconSymbol name="plus" size={24} color="black" />
             <Text style={styles.ctaText}>Add Money</Text>
           </View>
-          <Link href="/selectContactScreen">
+          <Link href="/transferScreen/selectContact">
             <View style={styles.ctaItem}>
               <IconSymbol name="paperplane.fill" size={24} color="black" />
               <Text style={styles.ctaText}>Send Money</Text>

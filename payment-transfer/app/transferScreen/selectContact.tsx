@@ -14,7 +14,7 @@ import { useRouter } from 'expo-router';
 import { ContentLayoutView } from '@/components/ContentLayoutView';
 import { HeaderWithBackBtn } from '@/components/HeaderWithBackBtn';
 
-export default function SelectContactScreen() {
+export default function SelectContact() {
   const [contacts, setContacts] = useState<Contacts.Contact[]>([]);
   const [filteredContacts, setFilteredContacts] = useState<Contacts.Contact[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
@@ -63,7 +63,7 @@ export default function SelectContactScreen() {
 
     // by proper we need to call some API to retrieve the user duitnow/bank detail
     router.push({
-      pathname: '/sendMoney',
+      pathname: '/transferScreen/sendMoney',
       params: { name: contactName, phone: phoneNumber },
     });
   };

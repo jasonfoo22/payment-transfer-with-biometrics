@@ -3,8 +3,10 @@ import { StyleSheet, Text, View, TextInput, TouchableOpacity, Image } from 'reac
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { ContentLayoutView } from '@/components/ContentLayoutView';
 import { HeaderWithBackBtn } from '@/components/HeaderWithBackBtn';
+import { mockUserData } from '@/mockData';
 
 export default function SendMoneyScreen() {
+  const { balance } = mockUserData.user;
   const router = useRouter();
   const { name, phone } = useLocalSearchParams<{
     name?: string | string[];
@@ -27,7 +29,12 @@ export default function SendMoneyScreen() {
     setError(errors);
     if (Object.keys(errors).length > 0) return;
 
-    router.back();
+    console.log(receiverName, '>> receiverName');
+
+    router.push({
+      pathname: '/transferScreen/confirmation',
+      params: { name: receiverName, phone: phoneNumber, amount, notes },
+    });
   };
 
   const handleAmountChange = (value: string) => {
@@ -72,7 +79,7 @@ export default function SendMoneyScreen() {
               </View>
               {error.amount && <Text style={styles.errorText}>{error.amount}</Text>}
               <View style={styles.balanceAmountWrapper}>
-                <Text style={styles.balanceAmount}>Balance: RM23.00</Text>
+                <Text style={styles.balanceAmount}>Balance: RM{balance.toFixed(2)}</Text>
               </View>
             </View>
 
@@ -143,6 +150,7 @@ const styles = StyleSheet.create({
     fontSize: 32,
     fontWeight: 'bold',
     elevation: 2,
+    outline: 'none',
   },
   balanceAmountWrapper: {
     flexDirection: 'row',

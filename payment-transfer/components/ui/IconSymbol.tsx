@@ -14,6 +14,7 @@ const MAPPING = {
   'paperplane.fill': 'send',
   plus: 'add',
   book: 'contacts',
+  checkmark: 'check',
   'chevron.left.forwardslash.chevron.right': 'code',
   'chevron.right': 'chevron-right',
   'chevron.left': 'chevron-left',
@@ -39,7 +40,7 @@ export function IconSymbol({
 }: {
   name: IconSymbolName;
   size?: number;
-  color: string | OpaqueColorValue;
+  color?: string | OpaqueColorValue;
   style?: StyleProp<ViewStyle>;
   weight?: SymbolWeight;
 }) {
