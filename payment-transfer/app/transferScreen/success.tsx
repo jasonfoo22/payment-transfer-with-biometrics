@@ -3,9 +3,12 @@ import { useRouter, useLocalSearchParams } from 'expo-router';
 import { ContentLayoutView } from '@/components/ContentLayoutView';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import { Colors } from '@/constants/Colors';
+import { useSelector } from 'react-redux';
+import { selectUser } from '@/store/slices/transactionsSlice';
 
 export default function SuccessScreen() {
   const router = useRouter();
+  const user = useSelector(selectUser);
   const {
     name = 'Unknown',
     phone = 'N/A',
@@ -82,13 +85,7 @@ const styles = StyleSheet.create({
     borderColor: Colors.success,
     padding: 16,
     elevation: 5,
-    shadowColor: 'rgba(0, 0, 0, 0.2)',
-    shadowOffset: {
-      width: 0,
-      height: 4,
-    },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
+    boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.2)',
   },
   receiverContainer: {
     flexDirection: 'row',

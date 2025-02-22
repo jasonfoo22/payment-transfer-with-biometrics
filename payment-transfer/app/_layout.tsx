@@ -4,6 +4,8 @@ import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect, useState } from 'react';
+import { Provider } from 'react-redux';
+import { store } from '@/store';
 import 'react-native-reanimated';
 
 import { useColorScheme } from '@/hooks/useColorScheme';
@@ -29,18 +31,20 @@ export default function RootLayout() {
   }
 
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="loginLoading" options={{ headerShown: false }} />
-        <Stack.Screen name="login" options={{ headerShown: false }} />
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="transferScreen/sendMoney" options={{ headerShown: false }} />
-        <Stack.Screen name="transferScreen/selectContact" options={{ headerShown: false }} />
-        <Stack.Screen name="transferScreen/confirmation" options={{ headerShown: false }} />
-        <Stack.Screen name="transferScreen/success" options={{ headerShown: false }} />
-        <Stack.Screen name="+not-found" />
-      </Stack>
-      <StatusBar style="auto" />
-    </ThemeProvider>
+    <Provider store={store}>
+      <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+        <Stack>
+          <Stack.Screen name="loginLoading" options={{ headerShown: false }} />
+          <Stack.Screen name="login" options={{ headerShown: false }} />
+          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          <Stack.Screen name="transferScreen/sendMoney" options={{ headerShown: false }} />
+          <Stack.Screen name="transferScreen/selectContact" options={{ headerShown: false }} />
+          <Stack.Screen name="transferScreen/confirmation" options={{ headerShown: false }} />
+          <Stack.Screen name="transferScreen/success" options={{ headerShown: false }} />
+          <Stack.Screen name="+not-found" />
+        </Stack>
+        <StatusBar style="auto" />
+      </ThemeProvider>
+    </Provider>
   );
 }

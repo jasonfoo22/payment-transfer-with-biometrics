@@ -1,15 +1,16 @@
 import React, { useState } from 'react';
 import { StyleSheet, Text, View, FlatList, TouchableOpacity } from 'react-native';
 import dayjs from 'dayjs';
-import { mockUserData } from '@/mockData';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import { Link } from 'expo-router';
 import { ContentLayoutView } from '@/components/ContentLayoutView';
 import { TransactionType } from '@/interface/transaction';
 import { Colors } from '@/constants/Colors';
+import { useSelector } from 'react-redux';
+import { selectUser } from '@/store/slices/transactionsSlice';
 
 export default function HomeScreen() {
-  const { balance, transactions } = mockUserData.user;
+  const user = useSelector(selectUser);
   const [isBalanceHidden, setIsBalanceHidden] = useState(false);
 
   return (
@@ -18,7 +19,7 @@ export default function HomeScreen() {
         <View>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
             <Text style={styles.balance}>
-              {isBalanceHidden ? '*****' : `RM${balance.toFixed(2)}`}
+              {isBalanceHidden ? '*****' : `RM${user?.balance.toFixed(2)}`}
             </Text>
             <TouchableOpacity onPress={() => setIsBalanceHidden(prev => !prev)}>
               <IconSymbol
@@ -50,7 +51,7 @@ export default function HomeScreen() {
       <View style={styles.transactionContainer}>
         <Text style={styles.sectionTitle}>Transaction History</Text>
         <FlatList
-          data={transactions}
+          data={user?.transactions}
           keyExtractor={item => item._id}
           renderItem={({ item }) => (
             <View style={styles.transactionItem}>

@@ -4,9 +4,13 @@ import * as LocalAuthentication from 'expo-local-authentication';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { ContentLayoutView } from '@/components/ContentLayoutView';
 import { HeaderWithBackBtn } from '@/components/HeaderWithBackBtn';
+import { Transaction, TransactionType } from '@/interface/transaction';
+import { useDispatch } from 'react-redux';
+import { addTransaction } from '@/store/slices/transactionsSlice';
 
 export default function Confirmation() {
   const router = useRouter();
+  const dispatch = useDispatch();
   const { name, phone, amount, notes } = useLocalSearchParams<{
     name: string;
     phone: string;
@@ -14,15 +18,19 @@ export default function Confirmation() {
     notes?: string;
   }>();
   const [timeLeft, setTimeLeft] = useState(120); // 2 minutes
+  const [transactionComplete, setTransactionComplete] = useState(false);
 
   useEffect(() => {
+    if (transactionComplete) {
+      return;
+    }
     if (timeLeft <= 0) {
       router.back();
       return;
     }
     const timer = setInterval(() => setTimeLeft(prev => prev - 1), 1000);
     return () => clearInterval(timer);
-  }, [timeLeft]);
+  }, [timeLeft, transactionComplete]);
 
   const handleApprove = async () => {
     const hasBiometrics = await LocalAuthentication.hasHardwareAsync();
@@ -58,6 +66,23 @@ export default function Confirmation() {
   };
 
   const completeTransaction = () => {
+    setTransactionComplete(true);
+
+    // should call the API here and invalidate the transaction
+    const transaction: Transaction = {
+      _id: `${Date.now()}`, // Generate a unique ID
+      type: TransactionType.SEND_MONEY, // Adjust as needed
+      amount: parseFloat(amount),
+      createdAt: new Date().toISOString(),
+      senderId: '550e8400-e29b-41d4-a716-446655440000', // Use actual sender ID
+      senderName: 'Jason Foo', // Use actual sender name
+      receiverId: '8c21b9f0-5e12-42d9-8a1f-3b5d5c1a6bff', // Use actual receiver ID
+      receiverName: name, // Receiver's name from the params
+      notes,
+    };
+
+    dispatch(addTransaction(transaction)); // Dispatch action to add the transaction
+
     router.push({
       pathname: '/transferScreen/success',
       params: { name, phone, amount },
