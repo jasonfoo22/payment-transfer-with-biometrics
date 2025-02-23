@@ -8,6 +8,7 @@ import { TransactionType } from '@/interface/transaction';
 import { Colors } from '@/constants/Colors';
 import { useSelector } from 'react-redux';
 import { selectUser } from '@/store/slices/transactionsSlice';
+import { Routes } from '@/constants/Routes';
 
 export default function HomeScreen() {
   const user = useSelector(selectUser);
@@ -39,7 +40,7 @@ export default function HomeScreen() {
             <IconSymbol name="plus" size={24} color="black" />
             <Text style={styles.ctaText}>Add Money</Text>
           </View>
-          <Link href="/transferScreen/selectContact">
+          <Link href={Routes.transfer.selectContact}>
             <View style={styles.ctaItem}>
               <IconSymbol name="paperplane.fill" size={24} color="black" />
               <Text style={styles.ctaText}>Send Money</Text>

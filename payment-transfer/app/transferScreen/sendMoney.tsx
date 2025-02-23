@@ -4,6 +4,7 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { ContentLayoutView } from '@/components/ContentLayoutView';
 import { HeaderWithBackBtn } from '@/components/HeaderWithBackBtn';
 import { mockUserData } from '@/mockData';
+import { Routes } from '@/constants/Routes';
 
 export default function SendMoneyScreen() {
   const { balance } = mockUserData.user;
@@ -30,7 +31,7 @@ export default function SendMoneyScreen() {
     if (Object.keys(errors).length > 0) return;
 
     router.push({
-      pathname: '/transferScreen/confirmation',
+      pathname: Routes.transfer.confirmation,
       params: { name: receiverName, phone: phoneNumber, amount, notes },
     });
   };

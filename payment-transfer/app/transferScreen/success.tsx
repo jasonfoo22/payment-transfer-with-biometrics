@@ -5,6 +5,7 @@ import { IconSymbol } from '@/components/ui/IconSymbol';
 import { Colors } from '@/constants/Colors';
 import { useSelector } from 'react-redux';
 import { selectUser } from '@/store/slices/transactionsSlice';
+import { Routes } from '@/constants/Routes';
 
 export default function SuccessScreen() {
   const router = useRouter();
@@ -21,7 +22,7 @@ export default function SuccessScreen() {
 
   const backToHome = () => {
     router.push({
-      pathname: '/',
+      pathname: Routes.tabs,
     });
   };
 

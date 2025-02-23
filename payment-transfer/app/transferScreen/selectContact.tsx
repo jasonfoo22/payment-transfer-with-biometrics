@@ -13,6 +13,7 @@ import * as Contacts from 'expo-contacts';
 import { useRouter } from 'expo-router';
 import { ContentLayoutView } from '@/components/ContentLayoutView';
 import { HeaderWithBackBtn } from '@/components/HeaderWithBackBtn';
+import { Routes } from '@/constants/Routes';
 
 export default function SelectContact() {
   const [contacts, setContacts] = useState<Contacts.Contact[]>([]);
@@ -63,7 +64,7 @@ export default function SelectContact() {
 
     // by proper we need to call some API to retrieve the user duitnow/bank detail
     router.push({
-      pathname: '/transferScreen/sendMoney',
+      pathname: Routes.transfer.sendMoney,
       params: { name: contactName, phone: phoneNumber },
     });
   };

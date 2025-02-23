@@ -7,6 +7,7 @@ import { HeaderWithBackBtn } from '@/components/HeaderWithBackBtn';
 import { Transaction, TransactionType } from '@/interface/transaction';
 import { useDispatch } from 'react-redux';
 import { addTransaction } from '@/store/slices/transactionsSlice';
+import { Routes } from '@/constants/Routes';
 
 export default function Confirmation() {
   const router = useRouter();
@@ -74,17 +75,17 @@ export default function Confirmation() {
       type: TransactionType.SEND_MONEY, // Adjust as needed
       amount: parseFloat(amount),
       createdAt: new Date().toISOString(),
-      senderId: '550e8400-e29b-41d4-a716-446655440000', // Use actual sender ID
-      senderName: 'Jason Foo', // Use actual sender name
-      receiverId: '8c21b9f0-5e12-42d9-8a1f-3b5d5c1a6bff', // Use actual receiver ID
-      receiverName: name, // Receiver's name from the params
+      senderId: '550e8400-e29b-41d4-a716-446655440000',
+      senderName: 'Jason Foo',
+      receiverId: `${name}-002`, // mock receiver ID
+      receiverName: name,
       notes,
     };
 
     dispatch(addTransaction(transaction)); // Dispatch action to add the transaction
 
     router.replace({
-      pathname: '/transferScreen/success',
+      pathname: Routes.transfer.success,
       params: { name, phone, amount },
     });
   };
