@@ -14,10 +14,11 @@ export const mockTransferApi = async ({
         resolve({
           _id: `${Date.now()}`, // Generate a unique ID
           type: TransactionType.SEND_MONEY,
+          userId: mockUserData._id, //hardcode for now, should be from auth
           amount: parseFloat(amount),
           createdAt: new Date().toISOString(),
-          senderId: mockUserData.user._id, //hardcode for now, should be from auth
-          senderName: mockUserData.user.name, //hardcode for now, should be from auth
+          senderId: mockUserData._id, //hardcode for now, should be from auth
+          senderName: mockUserData.name, //hardcode for now, should be from auth
           receiverId: recipient?._id,
           receiverName: recipient?.name,
           receiverPhone: recipient?.phone,

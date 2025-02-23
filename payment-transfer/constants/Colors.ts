@@ -29,4 +29,9 @@ export const Colors = {
   success: '#37c8c2',
   disabled: '#c0c0c0',
   warning: '#d62828',
+  darkGrey: '#555',
+  midDarkGrey: '#757575',
+  midLightGrey: '#bdbdbd',
+  lightGrey: '#e0e0e0',
+  white: '#fff',
 };

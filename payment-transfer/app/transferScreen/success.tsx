@@ -16,14 +16,14 @@ import { Routes } from '@/constants/Routes';
 import { clearTransfer } from '@/store/slices/transferSlice';
 import { convertCurrencyValue } from '@/utils/currencyFormatter';
 import React, { useCallback, useEffect } from 'react';
-import { selectUser } from '@/store/slices/transactionsSlice';
 import dayjs from 'dayjs';
 import { useFetchTransactionDetailsQuery } from '@/store/api/transactionApi';
+import { selectTransactions } from '@/store/slices/transactionsSlice';
 
 export default function SuccessScreen() {
   const router = useRouter();
   const dispatch = useDispatch();
-  const user = useSelector(selectUser);
+  const transactionsData = useSelector(selectTransactions);
   const { transactionId } = useLocalSearchParams();
   // Handle case where transactionId might be an array
   const id = Array.isArray(transactionId) ? transactionId[0] : transactionId;
@@ -35,7 +35,7 @@ export default function SuccessScreen() {
   } = useFetchTransactionDetailsQuery(
     {
       transactionId: id,
-      transactions: user.transactions,
+      transactions: transactionsData,
     },
     { skip: !id },
   );

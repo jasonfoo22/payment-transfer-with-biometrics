@@ -6,9 +6,9 @@ import { HeaderWithBackBtn } from '@/components/HeaderWithBackBtn';
 import { Routes } from '@/constants/Routes';
 import { useDispatch, useSelector } from 'react-redux';
 import { selectTransferDetail, setTransferAmount } from '@/store/slices/transferSlice';
-import { selectUser } from '@/store/slices/transactionsSlice';
 import { Colors } from '@/constants/Colors';
 import { convertCurrencyValue } from '@/utils/currencyFormatter';
+import { selectUser } from '@/store/slices/userSlice';
 
 export default function SendMoneyScreen() {
   const router = useRouter();

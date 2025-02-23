@@ -7,9 +7,10 @@ import { ContentLayoutView } from '@/components/ContentLayoutView';
 import { Transaction, TransactionType } from '@/interface/transaction';
 import { Colors } from '@/constants/Colors';
 import { useSelector } from 'react-redux';
-import { selectUser } from '@/store/slices/transactionsSlice';
+import { selectTransactions } from '@/store/slices/transactionsSlice';
 import { Routes } from '@/constants/Routes';
 import { convertCurrencyValue } from '@/utils/currencyFormatter';
+import { selectUser } from '@/store/slices/userSlice';
 
 interface TransactionSection {
   month: string;
@@ -43,12 +44,13 @@ const calculateMonthWidth = (month: string) => {
 };
 
 export default function HomeScreen() {
+  const transactionsData = useSelector(selectTransactions);
   const user = useSelector(selectUser);
   const [isBalanceHidden, setIsBalanceHidden] = useState(false);
 
   const transactionsByMonth = useMemo(
-    () => groupTransactionsByMonth(user?.transactions),
-    [user?.transactions],
+    () => groupTransactionsByMonth(transactionsData),
+    [transactionsData],
   );
 
   return (
@@ -152,7 +154,7 @@ const styles = StyleSheet.create({
   desc: {
     fontSize: 16,
     marginTop: 4,
-    color: 'gray',
+    color: Colors.midDarkGrey,
   },
   ctaContainer: {
     marginBottom: 20,
@@ -199,7 +201,7 @@ const styles = StyleSheet.create({
   transactionItem: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    backgroundColor: 'white',
+    backgroundColor: Colors.white,
     padding: 15,
     borderRadius: 10,
     marginBottom: 10,
@@ -207,7 +209,7 @@ const styles = StyleSheet.create({
   },
   transactionReceiver: {
     fontSize: 14,
-    color: '#555',
+    color: Colors.darkGrey,
     marginVertical: 2,
   },
   transactionType: {
@@ -216,7 +218,7 @@ const styles = StyleSheet.create({
   },
   transactionDate: {
     fontSize: 14,
-    color: 'gray',
+    color: Colors.midLightGrey,
   },
   transactionAmount: {
     fontSize: 16,

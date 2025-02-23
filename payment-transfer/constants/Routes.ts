@@ -7,6 +7,7 @@ export const Routes = {
     selectContact: '/transferScreen/selectContact',
     confirmation: '/transferScreen/confirmation',
     success: '/transferScreen/success',
+    fails: '/transferScreen/fails',
   },
   notFound: '/+not-found',
 } as const;

@@ -64,8 +64,8 @@ export default function SelectContact() {
       const phoneNumber = contact.phoneNumbers?.[0]?.number;
       const contactName = Array.isArray(contact.name) ? contact.name.join(' ') : contact.name;
 
-      // Ideally, we should call an API to fetch the user's DuitNow or bank details
       try {
+        // Ideally, we should call an API to fetch the user's from paynet or similar API to get bank details
         // const bankDetails = await getUserBankDetails(contact.id); // Mock API call
         dispatch(
           setRecipient({

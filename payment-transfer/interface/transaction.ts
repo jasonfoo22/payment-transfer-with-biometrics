@@ -13,6 +13,7 @@ export enum TopUpMethodType {
 export type Transaction = {
   _id: string;
   type: TransactionType;
+  userId: string;
   amount: number;
   createdAt: string;
   receiverId?: string;
@@ -28,5 +29,4 @@ export type User = {
   _id: string;
   name: string;
   balance: number;
-  transactions: Transaction[];
 };

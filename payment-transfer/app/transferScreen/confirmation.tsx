@@ -20,10 +20,34 @@ import { Colors } from '@/constants/Colors';
 import { convertCurrencyValue } from '@/utils/currencyFormatter';
 import { useCreateTransactionMutation } from '@/store/api/transactionApi';
 import * as Network from 'expo-network';
+import { selectUser, updateUserBalance } from '@/store/slices/userSlice';
+import { Transaction, TransactionType } from '@/interface/transaction';
+
+const calculateNewBalance = (transaction: Transaction, currentBalance: number) => {
+  let newBalance = currentBalance;
+
+  switch (transaction.type) {
+    case TransactionType.SEND_MONEY:
+      newBalance -= transaction.amount;
+      break;
+    case TransactionType.RECEIVE_MONEY:
+    case TransactionType.TOP_UP:
+      newBalance += transaction.amount;
+      break;
+    case TransactionType.PAY_BILLS:
+      newBalance -= transaction.amount;
+      break;
+    default:
+      break;
+  }
+
+  return newBalance.toFixed(2);
+};
 
 export default function Confirmation() {
   const router = useRouter();
   const dispatch = useDispatch();
+  const user = useSelector(selectUser);
   const { recipient, amount, notes } = useSelector(selectTransferDetail);
   const [timeLeft, setTimeLeft] = useState(120); // 2 minutes
   const [transactionComplete, setTransactionComplete] = useState(false);
@@ -91,17 +115,21 @@ export default function Confirmation() {
         notes,
       }).unwrap();
 
-      dispatch(addTransaction(transaction));
+      dispatch(addTransaction(transaction)); // should happen on backend and frontend just retrieve update
+      const newBalance = calculateNewBalance(transaction, user.balance);
+      dispatch(updateUserBalance(parseFloat(newBalance))); // should happen on backend and frontend just retrieve update
       router.replace({
         pathname: Routes.transfer.success,
         params: { transactionId: transaction._id },
       });
     } catch (error: any) {
       const errorMessage = error || 'Something went wrong.';
-      Alert.alert('Transaction Failed', errorMessage);
       setTimeLeft(0);
       setTransactionComplete(false);
-      router.back();
+      router.replace({
+        pathname: Routes.transfer.fails,
+        params: { error: errorMessage },
+      });
     }
   };
 

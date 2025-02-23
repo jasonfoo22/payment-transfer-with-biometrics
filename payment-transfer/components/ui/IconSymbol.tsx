@@ -15,6 +15,7 @@ const MAPPING = {
   plus: 'add',
   book: 'contacts',
   checkmark: 'check',
+  xmark: 'close',
   'chevron.left.forwardslash.chevron.right': 'code',
   'chevron.right': 'chevron-right',
   'chevron.left': 'chevron-left',
