@@ -20,11 +20,29 @@ export const mockTransferApi = async ({
           senderName: mockUserData.user.name, //hardcode for now, should be from auth
           receiverId: recipient?._id,
           receiverName: recipient?.name,
+          receiverPhone: recipient?.phone,
           notes,
         });
       } else {
         reject(new Error('Network error. Please try again.'));
       }
     }, 1500); // Simulating 1.5s API delay
+  });
+};
+
+export const mockFetchTransactionDetailsById = async (
+  transactionId: string,
+  transactions: Transaction[],
+): Promise<Transaction | null> => {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      const transaction = transactions.find(tx => tx._id === transactionId);
+
+      if (transaction) {
+        resolve(transaction);
+      } else {
+        reject(new Error('Transaction not found.'));
+      }
+    }, 2000); // Simulating 1.5s API delay
   });
 };

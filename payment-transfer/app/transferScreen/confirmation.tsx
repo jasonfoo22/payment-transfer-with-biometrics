@@ -86,8 +86,11 @@ export default function Confirmation() {
         notes,
       });
 
-      dispatch(addTransaction(transaction)); // Dispatch the transaction to Redux
-      router.replace(Routes.transfer.success);
+      dispatch(addTransaction(transaction));
+      router.replace({
+        pathname: Routes.transfer.success,
+        params: { transactionId: transaction._id },
+      });
     } catch (error) {
       if (error instanceof Error) {
         Alert.alert('Transaction Failed', error.message);

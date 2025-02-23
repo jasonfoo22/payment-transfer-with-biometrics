@@ -1,7 +1,6 @@
 export const Routes = {
   loginLoading: '/loginLoading',
   tabs: '/(tabs)',
-  home: '/(tabs)/index',
   profile: '/(tabs)/profile',
   transfer: {
     sendMoney: '/transferScreen/sendMoney',

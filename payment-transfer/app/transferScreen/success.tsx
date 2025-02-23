@@ -1,5 +1,13 @@
-import { StyleSheet, Text, View, Image, TouchableOpacity } from 'react-native';
-import { useRouter } from 'expo-router';
+import {
+  StyleSheet,
+  Text,
+  View,
+  Image,
+  TouchableOpacity,
+  ActivityIndicator,
+  Alert,
+} from 'react-native';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import { ContentLayoutView } from '@/components/ContentLayoutView';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import { Colors } from '@/constants/Colors';
@@ -7,19 +15,65 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Routes } from '@/constants/Routes';
 import { clearTransfer, selectTransferDetail } from '@/store/slices/transferSlice';
 import { convertCurrencyValue } from '@/utils/currencyFormatter';
-import React from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
+import { Transaction } from '@/interface/transaction';
+import { mockFetchTransactionDetailsById } from '@/mock/mockAPI';
+import { selectUser } from '@/store/slices/transactionsSlice';
+import dayjs from 'dayjs';
 
 export default function SuccessScreen() {
   const router = useRouter();
   const dispatch = useDispatch();
-  const { recipient, amount, notes } = useSelector(selectTransferDetail);
+  const user = useSelector(selectUser);
+  const { transactionId } = useLocalSearchParams();
+  const [transaction, setTransaction] = useState<Transaction | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  // Handle case where transactionId might be an array
+  const id = Array.isArray(transactionId) ? transactionId[0] : transactionId;
 
-  const backToHome = () => {
+  useEffect(() => {
+    if (!transactionId) return;
+
+    const fetchTransactionDetails = async () => {
+      try {
+        const response = await mockFetchTransactionDetailsById(id, user.transactions); // for mocking only, Pass transactions from the state
+        setTransaction(response);
+      } catch (err) {
+        console.error(err);
+        Alert.alert(
+          'Error',
+          'There was an issue fetching transaction details. You will be redirected to the home screen.',
+          [
+            {
+              text: 'OK',
+              onPress: () => router.push(Routes.tabs), // Adjust the route as needed
+            },
+          ],
+        );
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchTransactionDetails();
+  }, [transactionId, user.transactions]);
+
+  const backToHome = useCallback(() => {
     dispatch(clearTransfer()); // Clear transfer details
     router.push({
       pathname: Routes.tabs,
     });
-  };
+  }, [dispatch, router]);
+
+  if (loading) {
+    return (
+      <ContentLayoutView>
+        <View style={styles.loaderWrapper}>
+          <ActivityIndicator size="large" />
+        </View>
+      </ContentLayoutView>
+    );
+  }
 
   return (
     <ContentLayoutView>
@@ -29,27 +83,47 @@ export default function SuccessScreen() {
             <IconSymbol name="checkmark" size={40} weight="medium" color={Colors.success} />
           </View>
         </View>
-        <Text style={styles.successText}>Transaction Successful</Text>
-        <Text style={styles.successTextAmount}>RM {convertCurrencyValue(amount)}</Text>
-        {notes && (
-          <View>
-            <Text style={styles.label}>Notes:</Text>
-            <Text style={styles.value}>{notes}</Text>
+        <View>
+          <View style={styles.transactionAmountWrapper}>
+            <Text style={styles.successText}>Transfer Successful</Text>
+            <Text style={styles.successTextAmount}>
+              RM {convertCurrencyValue(transaction?.amount ? transaction?.amount.toFixed(2) : '0')}
+            </Text>
           </View>
-        )}
-        <View style={styles.receiverContainer}>
-          <Image
-            source={require('@/assets/images/duitnowlogo.png')}
-            style={styles.logo}
-            resizeMode="contain"
-          />
-          <View style={styles.receiverInfoWrapper}>
-            <Text style={styles.receiverName}>{recipient?.name}</Text>
-            <Text style={styles.phoneNumber}>{recipient?.phone}</Text>
+          <View style={styles.transactionDetailsWrapper}>
+            <Text style={styles.transactionRef}>Ref: {transaction?._id}</Text>
+            <View style={styles.horizontalDivider} />
+            <Text style={styles.transactionTime}>
+              {dayjs(transaction?.createdAt).format('DD MMM YYYY, hh:mm A')}
+            </Text>
           </View>
         </View>
+        <View style={styles.divider} />
+        <View style={styles.transferDetailsWrapper}>
+          <View style={styles.receiverContainer}>
+            <Image
+              source={require('@/assets/images/duitnowlogo.png')}
+              style={styles.logo}
+              resizeMode="contain"
+            />
+            <View style={styles.receiverInfoWrapper}>
+              {transaction?.receiverName && (
+                <Text style={styles.receiverName}>{transaction.receiverName}</Text>
+              )}
+              {transaction?.receiverPhone && (
+                <Text style={styles.phoneNumber}>{transaction.receiverPhone}</Text>
+              )}
+            </View>
+          </View>
+          {transaction?.notes && (
+            <View>
+              <Text style={styles.label}>Notes:</Text>
+              <Text style={styles.value}>{transaction?.notes}</Text>
+            </View>
+          )}
+        </View>
       </View>
-      <TouchableOpacity style={styles.homeBtn} onPress={backToHome}>
+      <TouchableOpacity style={styles.homeBtn} onPress={backToHome} disabled={loading}>
         <Text style={styles.homeText}>Back to Home</Text>
       </TouchableOpacity>
     </ContentLayoutView>
@@ -57,6 +131,11 @@ export default function SuccessScreen() {
 }
 
 const styles = StyleSheet.create({
+  loaderWrapper: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   container: {
     flex: 1,
     justifyContent: 'center',
@@ -79,6 +158,38 @@ const styles = StyleSheet.create({
     fontSize: 28,
     fontWeight: 'bold',
     color: '#5E72E4',
+  },
+  transactionAmountWrapper: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  transactionDetailsWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 4,
+    marginTop: 12,
+  },
+  transactionRef: {
+    fontSize: 12,
+  },
+  horizontalDivider: {
+    width: 1,
+    height: 10,
+    backgroundColor: '#ccc',
+    marginHorizontal: 2,
+  },
+  transactionTime: {
+    fontSize: 10,
+  },
+  divider: {
+    width: '100%',
+    height: 1,
+    backgroundColor: '#ccc',
+    marginVertical: 20,
+  },
+  transferDetailsWrapper: {
+    gap: 16,
   },
   label: {
     fontSize: 18,

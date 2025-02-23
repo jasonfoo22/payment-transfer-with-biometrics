@@ -16,9 +16,10 @@ export type Transaction = {
   amount: number;
   createdAt: string;
   receiverId?: string;
-  receiverName?: string;
+  receiverName?: string; // purely for mocking purpose, PII data shoudn't be stored in transaction
+  receiverPhone?: string; // purely for mocking purpose, PII data shoudn't be stored in transaction
   senderId?: string;
-  senderName?: string;
+  senderName?: string; // purely for mocking purpose, PII data shoudn't be stored in transaction
   notes?: string;
   topUpMethod?: TopUpMethodType;
 };
