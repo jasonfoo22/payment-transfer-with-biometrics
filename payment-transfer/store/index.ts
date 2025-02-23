@@ -1,9 +1,11 @@
 import { configureStore } from '@reduxjs/toolkit';
 import transactionsReducer from './slices/transactionsSlice';
+import transferSlice from '@/store/slices/transferSlice';
 
 export const store = configureStore({
   reducer: {
     transactions: transactionsReducer,
+    transfer: transferSlice,
   },
 });
 

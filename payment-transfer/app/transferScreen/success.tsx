@@ -3,24 +3,17 @@ import { useRouter, useLocalSearchParams } from 'expo-router';
 import { ContentLayoutView } from '@/components/ContentLayoutView';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import { Colors } from '@/constants/Colors';
-import { useSelector } from 'react-redux';
-import { selectUser } from '@/store/slices/transactionsSlice';
+import { useDispatch, useSelector } from 'react-redux';
 import { Routes } from '@/constants/Routes';
+import { clearTransfer, selectTransferDetail } from '@/store/slices/transferSlice';
 
 export default function SuccessScreen() {
   const router = useRouter();
-  const user = useSelector(selectUser);
-  const {
-    name = 'Unknown',
-    phone = 'N/A',
-    amount = '0.00',
-  } = useLocalSearchParams<{
-    name: string;
-    phone: string;
-    amount: string;
-  }>();
+  const dispatch = useDispatch();
+  const { recipient, amount, notes } = useSelector(selectTransferDetail);
 
   const backToHome = () => {
+    dispatch(clearTransfer()); // Clear transfer details
     router.push({
       pathname: Routes.tabs,
     });
@@ -43,8 +36,8 @@ export default function SuccessScreen() {
             resizeMode="contain"
           />
           <View style={styles.receiverInfoWrapper}>
-            <Text style={styles.receiverName}>{name}</Text>
-            <Text style={styles.phoneNumber}>{phone}</Text>
+            <Text style={styles.receiverName}>{recipient?.name}</Text>
+            <Text style={styles.phoneNumber}>{recipient?.phone}</Text>
           </View>
         </View>
       </View>

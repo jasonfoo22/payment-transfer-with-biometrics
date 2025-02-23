@@ -14,12 +14,15 @@ import { useRouter } from 'expo-router';
 import { ContentLayoutView } from '@/components/ContentLayoutView';
 import { HeaderWithBackBtn } from '@/components/HeaderWithBackBtn';
 import { Routes } from '@/constants/Routes';
+import { useDispatch } from 'react-redux';
+import { setRecipient } from '@/store/slices/transferSlice';
 
 export default function SelectContact() {
   const [contacts, setContacts] = useState<Contacts.Contact[]>([]);
   const [filteredContacts, setFilteredContacts] = useState<Contacts.Contact[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(true);
+  const dispatch = useDispatch();
   const router = useRouter();
 
   useEffect(() => {
@@ -57,16 +60,30 @@ export default function SelectContact() {
   };
 
   const selectContact = (contact: Contacts.Contact) => {
-    const phoneNumber = contact.phoneNumbers?.[0]?.number || 'No Number';
-    const contactName = Array.isArray(contact.name)
-      ? contact.name.join(' ')
-      : contact.name || 'Unknown';
+    if (contact.phoneNumbers?.[0]?.number && contact.name) {
+      const phoneNumber = contact.phoneNumbers?.[0]?.number;
+      const contactName = Array.isArray(contact.name) ? contact.name.join(' ') : contact.name;
 
-    // by proper we need to call some API to retrieve the user duitnow/bank detail
-    router.push({
-      pathname: Routes.transfer.sendMoney,
-      params: { name: contactName, phone: phoneNumber },
-    });
+      // Ideally, we should call an API to fetch the user's DuitNow or bank details
+      try {
+        // const bankDetails = await getUserBankDetails(contact.id); // Mock API call
+        dispatch(
+          setRecipient({
+            _id: contact.id || '',
+            name: contactName,
+            phone: phoneNumber,
+            bankDetails: 'CIMB Bank, 1234567890', // Mock bank details
+          }),
+        );
+        router.push(Routes.transfer.sendMoney);
+      } catch (error) {
+        console.error('Failed to fetch bank details:', error);
+        Alert.alert(
+          'Oops! Something went wrong',
+          'We couldn’t fetch the bank details. Please try again in a moment.',
+        );
+      }
+    }
   };
 
   if (loading) {

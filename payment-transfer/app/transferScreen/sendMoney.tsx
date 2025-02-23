@@ -1,22 +1,31 @@
 import React, { useState } from 'react';
-import { StyleSheet, Text, View, TextInput, TouchableOpacity, Image } from 'react-native';
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import { StyleSheet, Text, View, TextInput, TouchableOpacity, Image, Alert } from 'react-native';
+import { useRouter } from 'expo-router';
 import { ContentLayoutView } from '@/components/ContentLayoutView';
 import { HeaderWithBackBtn } from '@/components/HeaderWithBackBtn';
-import { mockUserData } from '@/mockData';
 import { Routes } from '@/constants/Routes';
+import { useDispatch, useSelector } from 'react-redux';
+import { selectTransferDetail, setTransferAmount } from '@/store/slices/transferSlice';
+import { selectUser } from '@/store/slices/transactionsSlice';
 
 export default function SendMoneyScreen() {
-  const { balance } = mockUserData.user;
   const router = useRouter();
-  const { name, phone } = useLocalSearchParams<{
-    name?: string | string[];
-    phone?: string | string[];
-  }>();
+  const dispatch = useDispatch();
+  const transferDetail = useSelector(selectTransferDetail);
+  const user = useSelector(selectUser);
+
+  if (!transferDetail) {
+    Alert.alert(
+      'Missing Recipient',
+      'We need recipient details to proceed. Please go back and try again.',
+      [{ text: 'OK', onPress: () => router.back() }],
+    );
+    return null;
+  }
 
   // Ensure name and phone are always strings
-  const receiverName = Array.isArray(name) ? name[0] : name || '';
-  const phoneNumber = Array.isArray(phone) ? phone[0] : phone || '';
+  const receiverName = transferDetail?.recipient?.name ?? '';
+  const phoneNumber = transferDetail?.recipient?.phone ?? '';
 
   const [amount, setAmount] = useState('');
   const [notes, setNotes] = useState('');
@@ -30,10 +39,16 @@ export default function SendMoneyScreen() {
     setError(errors);
     if (Object.keys(errors).length > 0) return;
 
-    router.push({
-      pathname: Routes.transfer.confirmation,
-      params: { name: receiverName, phone: phoneNumber, amount, notes },
-    });
+    // router.push({
+    //   pathname: Routes.transfer.confirmation,
+    //   params: { name: receiverName, phone: phoneNumber, amount, notes },
+    // });
+
+    // Store amount and notes in Redux
+    dispatch(setTransferAmount({ amount, notes }));
+
+    // Navigate to confirmation screen
+    router.push(Routes.transfer.confirmation);
   };
 
   const handleAmountChange = (value: string) => {
@@ -78,7 +93,7 @@ export default function SendMoneyScreen() {
               </View>
               {error.amount && <Text style={styles.errorText}>{error.amount}</Text>}
               <View style={styles.balanceAmountWrapper}>
-                <Text style={styles.balanceAmount}>Balance: RM{balance.toFixed(2)}</Text>
+                <Text style={styles.balanceAmount}>Balance: RM{user?.balance.toFixed(2)}</Text>
               </View>
             </View>
 

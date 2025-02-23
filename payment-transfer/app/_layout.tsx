@@ -30,7 +30,7 @@ export default function RootLayout() {
     <Provider store={store}>
       <Stack screenOptions={{ headerShown: false }}>
         <Stack.Screen name={NormalizeRoutes.loginLoading} options={{ animation: 'none' }} />
-        <Stack.Screen name={NormalizeRoutes.tabs} />
+        <Stack.Screen name={NormalizeRoutes.tabs} options={{ gestureEnabled: false }} />
         <Stack.Screen name={NormalizeRoutes.transfer.sendMoney} />
         <Stack.Screen name={NormalizeRoutes.transfer.selectContact} />
         <Stack.Screen name={NormalizeRoutes.transfer.confirmation} />

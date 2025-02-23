@@ -5,19 +5,15 @@ import { useRouter, useLocalSearchParams } from 'expo-router';
 import { ContentLayoutView } from '@/components/ContentLayoutView';
 import { HeaderWithBackBtn } from '@/components/HeaderWithBackBtn';
 import { Transaction, TransactionType } from '@/interface/transaction';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { addTransaction } from '@/store/slices/transactionsSlice';
 import { Routes } from '@/constants/Routes';
+import { selectTransferDetail } from '@/store/slices/transferSlice';
 
 export default function Confirmation() {
   const router = useRouter();
   const dispatch = useDispatch();
-  const { name, phone, amount, notes } = useLocalSearchParams<{
-    name: string;
-    phone: string;
-    amount: string;
-    notes?: string;
-  }>();
+  const { recipient, amount, notes } = useSelector(selectTransferDetail);
   const [timeLeft, setTimeLeft] = useState(120); // 2 minutes
   const [transactionComplete, setTransactionComplete] = useState(false);
 
@@ -72,22 +68,19 @@ export default function Confirmation() {
     // should call the API here and invalidate the transaction
     const transaction: Transaction = {
       _id: `${Date.now()}`, // Generate a unique ID
-      type: TransactionType.SEND_MONEY, // Adjust as needed
+      type: TransactionType.SEND_MONEY,
       amount: parseFloat(amount),
       createdAt: new Date().toISOString(),
       senderId: '550e8400-e29b-41d4-a716-446655440000',
       senderName: 'Jason Foo',
-      receiverId: `${name}-002`, // mock receiver ID
-      receiverName: name,
+      receiverId: recipient?._id,
+      receiverName: recipient?.name,
       notes,
     };
 
     dispatch(addTransaction(transaction)); // Dispatch action to add the transaction
 
-    router.replace({
-      pathname: Routes.transfer.success,
-      params: { name, phone, amount },
-    });
+    router.replace(Routes.transfer.success);
   };
 
   return (
@@ -103,15 +96,14 @@ export default function Confirmation() {
               resizeMode="contain"
             />
             <View style={styles.receiverInfoWrapper}>
-              <Text style={styles.receiverName}>{name}</Text>
-              <Text style={styles.phoneNumber}>{phone}</Text>
+              <Text style={styles.receiverName}>{recipient?.name}</Text>
+              <Text style={styles.phoneNumber}>{recipient?.phone}</Text>
             </View>
           </View>
           <View>
             <Text style={styles.label}>Amount:</Text>
             <Text style={styles.amount}>RM {amount}</Text>
           </View>
-
           {notes && (
             <View>
               <Text style={styles.label}>Notes:</Text>
@@ -119,7 +111,6 @@ export default function Confirmation() {
             </View>
           )}
         </View>
-
         <TouchableOpacity
           style={[styles.button, timeLeft === 0 && styles.disabledButton]}
           onPress={handleApprove}
