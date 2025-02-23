@@ -20,6 +20,7 @@ import { mockTransferApi } from '@/mock/mockAPI';
 import { Transaction } from '@/interface/transaction';
 import { Colors } from '@/constants/Colors';
 import { convertCurrencyValue } from '@/utils/currencyFormatter';
+import { useCreateTransactionMutation } from '@/store/api/transactionApi';
 
 export default function Confirmation() {
   const router = useRouter();
@@ -27,7 +28,7 @@ export default function Confirmation() {
   const { recipient, amount, notes } = useSelector(selectTransferDetail);
   const [timeLeft, setTimeLeft] = useState(120); // 2 minutes
   const [transactionComplete, setTransactionComplete] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [createTransaction, { isLoading }] = useCreateTransactionMutation();
 
   useEffect(() => {
     if (transactionComplete) {
@@ -76,32 +77,25 @@ export default function Confirmation() {
 
   const completeTransaction = async () => {
     setTransactionComplete(true);
-    setLoading(true);
 
     try {
-      // Simulated API call
-      const transaction: Transaction = await mockTransferApi({
+      const transaction = await createTransaction({
         recipient,
         amount,
         notes,
-      });
+      }).unwrap();
 
       dispatch(addTransaction(transaction));
       router.replace({
         pathname: Routes.transfer.success,
         params: { transactionId: transaction._id },
       });
-    } catch (error) {
-      if (error instanceof Error) {
-        Alert.alert('Transaction Failed', error.message);
-      } else {
-        Alert.alert('Transaction Failed', 'Something went wrong.');
-      }
+    } catch (error: any) {
+      const errorMessage = error || 'Something went wrong.';
+      Alert.alert('Transaction Failed', errorMessage);
       setTimeLeft(0);
       setTransactionComplete(false);
       router.back();
-    } finally {
-      setLoading(false); // Hide loading indicator after API call
     }
   };
 
@@ -133,7 +127,7 @@ export default function Confirmation() {
             </View>
           )}
         </View>
-        {loading ? (
+        {isLoading ? (
           <ActivityIndicator size="large" color={Colors.primary} />
         ) : (
           <TouchableOpacity

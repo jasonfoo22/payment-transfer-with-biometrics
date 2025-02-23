@@ -13,50 +13,64 @@ import { IconSymbol } from '@/components/ui/IconSymbol';
 import { Colors } from '@/constants/Colors';
 import { useDispatch, useSelector } from 'react-redux';
 import { Routes } from '@/constants/Routes';
-import { clearTransfer, selectTransferDetail } from '@/store/slices/transferSlice';
+import { clearTransfer } from '@/store/slices/transferSlice';
 import { convertCurrencyValue } from '@/utils/currencyFormatter';
-import React, { useCallback, useEffect, useState } from 'react';
-import { Transaction } from '@/interface/transaction';
-import { mockFetchTransactionDetailsById } from '@/mock/mockAPI';
+import React, { useCallback, useEffect } from 'react';
 import { selectUser } from '@/store/slices/transactionsSlice';
 import dayjs from 'dayjs';
+import { useFetchTransactionDetailsQuery } from '@/store/api/transactionApi';
 
 export default function SuccessScreen() {
   const router = useRouter();
   const dispatch = useDispatch();
   const user = useSelector(selectUser);
   const { transactionId } = useLocalSearchParams();
-  const [transaction, setTransaction] = useState<Transaction | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
   // Handle case where transactionId might be an array
   const id = Array.isArray(transactionId) ? transactionId[0] : transactionId;
 
-  useEffect(() => {
-    if (!transactionId) return;
+  const {
+    data: transaction,
+    isLoading,
+    error,
+  } = useFetchTransactionDetailsQuery(
+    {
+      transactionId: id,
+      transactions: user.transactions,
+    },
+    { skip: !id },
+  );
 
-    const fetchTransactionDetails = async () => {
-      try {
-        const response = await mockFetchTransactionDetailsById(id, user.transactions); // for mocking only, Pass transactions from the state
-        setTransaction(response);
-      } catch (err) {
-        console.error(err);
+  // Handle error state
+  useEffect(() => {
+    if (!isLoading) {
+      if (error) {
         Alert.alert(
           'Error',
           'There was an issue fetching transaction details. You will be redirected to the home screen.',
           [
             {
               text: 'OK',
-              onPress: () => router.push(Routes.tabs), // Adjust the route as needed
+              onPress: () => router.push(Routes.tabs),
             },
           ],
         );
-      } finally {
-        setLoading(false);
       }
-    };
 
-    fetchTransactionDetails();
-  }, [transactionId, user.transactions]);
+      // Handle case when transaction is not found
+      if (!transaction) {
+        Alert.alert(
+          'Transaction Not Found',
+          'The transaction you are looking for does not exist.',
+          [
+            {
+              text: 'OK',
+              onPress: () => router.push(Routes.tabs),
+            },
+          ],
+        );
+      }
+    }
+  }, [error, transaction, router, isLoading]);
 
   const backToHome = useCallback(() => {
     dispatch(clearTransfer()); // Clear transfer details
@@ -65,7 +79,7 @@ export default function SuccessScreen() {
     });
   }, [dispatch, router]);
 
-  if (loading) {
+  if (isLoading) {
     return (
       <ContentLayoutView>
         <View style={styles.loaderWrapper}>
@@ -123,7 +137,7 @@ export default function SuccessScreen() {
           )}
         </View>
       </View>
-      <TouchableOpacity style={styles.homeBtn} onPress={backToHome} disabled={loading}>
+      <TouchableOpacity style={styles.homeBtn} onPress={backToHome} disabled={isLoading}>
         <Text style={styles.homeText}>Back to Home</Text>
       </TouchableOpacity>
     </ContentLayoutView>
