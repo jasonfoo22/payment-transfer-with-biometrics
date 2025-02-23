@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { Transaction, TransactionType, User } from '@/interface/transaction';
-import { mockUserData } from '@/mockData';
+import { mockUserData } from '@/mock/mockData';
 import { RootState } from '@/store';
 import dayjs from 'dayjs';
 

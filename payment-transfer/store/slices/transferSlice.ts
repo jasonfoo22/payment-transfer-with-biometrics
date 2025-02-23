@@ -1,18 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { RootState } from '@/store';
-
-interface Recipient {
-  _id: string;
-  name: string;
-  phone: string;
-  bankDetails: string;
-}
-
-interface TransferState {
-  recipient: Recipient | null;
-  amount: string;
-  notes: string;
-}
+import { Recipient, TransferState } from '@/interface/transfer';
 
 const initialState: TransferState = {
   recipient: null,

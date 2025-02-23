@@ -1,14 +1,24 @@
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, Image, Alert } from 'react-native';
+import {
+  StyleSheet,
+  Text,
+  View,
+  TouchableOpacity,
+  Image,
+  Alert,
+  ActivityIndicator,
+} from 'react-native';
 import * as LocalAuthentication from 'expo-local-authentication';
 import { useRouter } from 'expo-router';
 import { ContentLayoutView } from '@/components/ContentLayoutView';
 import { HeaderWithBackBtn } from '@/components/HeaderWithBackBtn';
-import { Transaction, TransactionType } from '@/interface/transaction';
 import { useDispatch, useSelector } from 'react-redux';
 import { addTransaction } from '@/store/slices/transactionsSlice';
 import { Routes } from '@/constants/Routes';
 import { selectTransferDetail } from '@/store/slices/transferSlice';
+import { mockTransferApi } from '@/mock/mockAPI';
+import { Transaction } from '@/interface/transaction';
+import { Colors } from '@/constants/Colors';
 
 export default function Confirmation() {
   const router = useRouter();
@@ -16,6 +26,7 @@ export default function Confirmation() {
   const { recipient, amount, notes } = useSelector(selectTransferDetail);
   const [timeLeft, setTimeLeft] = useState(120); // 2 minutes
   const [transactionComplete, setTransactionComplete] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (transactionComplete) {
@@ -62,25 +73,32 @@ export default function Confirmation() {
     );
   };
 
-  const completeTransaction = () => {
+  const completeTransaction = async () => {
     setTransactionComplete(true);
+    setLoading(true);
 
-    // should call the API here and invalidate the transaction
-    const transaction: Transaction = {
-      _id: `${Date.now()}`, // Generate a unique ID
-      type: TransactionType.SEND_MONEY,
-      amount: parseFloat(amount),
-      createdAt: new Date().toISOString(),
-      senderId: '550e8400-e29b-41d4-a716-446655440000',
-      senderName: 'Jason Foo',
-      receiverId: recipient?._id,
-      receiverName: recipient?.name,
-      notes,
-    };
+    try {
+      // Simulated API call
+      const transaction: Transaction = await mockTransferApi({
+        recipient,
+        amount,
+        notes,
+      });
 
-    dispatch(addTransaction(transaction)); // Dispatch action to add the transaction
-
-    router.replace(Routes.transfer.success);
+      dispatch(addTransaction(transaction)); // Dispatch the transaction to Redux
+      router.replace(Routes.transfer.success);
+    } catch (error) {
+      if (error instanceof Error) {
+        Alert.alert('Transaction Failed', error.message);
+      } else {
+        Alert.alert('Transaction Failed', 'Something went wrong.');
+      }
+      setTimeLeft(0);
+      setTransactionComplete(false);
+      router.back();
+    } finally {
+      setLoading(false); // Hide loading indicator after API call
+    }
   };
 
   return (
@@ -111,15 +129,19 @@ export default function Confirmation() {
             </View>
           )}
         </View>
-        <TouchableOpacity
-          style={[styles.button, timeLeft === 0 && styles.disabledButton]}
-          onPress={handleApprove}
-          disabled={timeLeft === 0}
-        >
-          <Text style={styles.buttonText}>
-            Approve ({Math.floor(timeLeft / 60)}:{(timeLeft % 60).toString().padStart(2, '0')})
-          </Text>
-        </TouchableOpacity>
+        {loading ? (
+          <ActivityIndicator size="large" color={Colors.primary} />
+        ) : (
+          <TouchableOpacity
+            style={[styles.button, timeLeft === 0 && styles.disabledButton]}
+            onPress={handleApprove}
+            disabled={timeLeft === 0}
+          >
+            <Text style={styles.buttonText}>
+              Approve ({Math.floor(timeLeft / 60)}:{(timeLeft % 60).toString().padStart(2, '0')})
+            </Text>
+          </TouchableOpacity>
+        )}
       </View>
     </ContentLayoutView>
   );
@@ -172,7 +194,7 @@ const styles = StyleSheet.create({
   },
   button: {
     alignItems: 'center',
-    backgroundColor: '#5E72E4',
+    backgroundColor: Colors.primary,
     paddingVertical: 15,
     paddingHorizontal: 40,
     borderRadius: 12,
