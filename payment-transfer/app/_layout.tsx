@@ -40,7 +40,10 @@ export default function RootLayout() {
           <Stack.Screen name="transferScreen/sendMoney" options={{ headerShown: false }} />
           <Stack.Screen name="transferScreen/selectContact" options={{ headerShown: false }} />
           <Stack.Screen name="transferScreen/confirmation" options={{ headerShown: false }} />
-          <Stack.Screen name="transferScreen/success" options={{ headerShown: false }} />
+          <Stack.Screen
+            name="transferScreen/success"
+            options={{ headerShown: false, gestureEnabled: false }}
+          />
           <Stack.Screen name="+not-found" />
         </Stack>
         <StatusBar style="auto" />

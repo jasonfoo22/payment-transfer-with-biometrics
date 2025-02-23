@@ -7,8 +7,6 @@ import dayjs from 'dayjs';
 interface TransactionsState {
   user: User | null;
   transactions: Transaction[];
-  loading: boolean;
-  error: string | null;
 }
 
 const sortedTransactions = mockUserData.user.transactions.sort((a, b) =>
@@ -18,8 +16,6 @@ const sortedTransactions = mockUserData.user.transactions.sort((a, b) =>
 const initialState: TransactionsState = {
   user: mockUserData.user, // get from mock user data
   transactions: sortedTransactions,
-  loading: false,
-  error: null,
 };
 
 const transactionsSlice = createSlice({

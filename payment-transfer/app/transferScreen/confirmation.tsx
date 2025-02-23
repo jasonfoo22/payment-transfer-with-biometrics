@@ -83,7 +83,7 @@ export default function Confirmation() {
 
     dispatch(addTransaction(transaction)); // Dispatch action to add the transaction
 
-    router.push({
+    router.replace({
       pathname: '/transferScreen/success',
       params: { name, phone, amount },
     });
