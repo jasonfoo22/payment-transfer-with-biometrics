@@ -18,15 +18,15 @@ This is a React Native project that demonstrates a simple payment transfer modul
 
 3. Configuration options:
    ```bash
-Inside the mock folder:
-- Modify `mockData` to change the initial data and balances.
-- Adjust `mockAPI` to modify the success rate for the transfer API.
+   Inside the mock folder:
+    - Modify `mockData` to change the initial data and balances.
+    - Adjust `mockAPI` to modify the success rate for the transfer API.
    ```
 
-# Brief of this project
+### Brief of this project
 Since the assessment is focused on payment transfers, I decided to concentrate on the transfer functionality and transaction history. I've split the mock data into two parts (user and transaction) to better reflect real-world scenarios. While some of this data could be PII, it's presented as mock data for this demonstration.
 
-# Technologies Used:
+### Technologies Used:
 - State Management: Redux
 - UI: React Native
 
