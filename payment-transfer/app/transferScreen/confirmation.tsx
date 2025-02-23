@@ -16,11 +16,10 @@ import { useDispatch, useSelector } from 'react-redux';
 import { addTransaction } from '@/store/slices/transactionsSlice';
 import { Routes } from '@/constants/Routes';
 import { selectTransferDetail } from '@/store/slices/transferSlice';
-import { mockTransferApi } from '@/mock/mockAPI';
-import { Transaction } from '@/interface/transaction';
 import { Colors } from '@/constants/Colors';
 import { convertCurrencyValue } from '@/utils/currencyFormatter';
 import { useCreateTransactionMutation } from '@/store/api/transactionApi';
+import * as Network from 'expo-network';
 
 export default function Confirmation() {
   const router = useRouter();
@@ -43,6 +42,13 @@ export default function Confirmation() {
   }, [timeLeft, transactionComplete]);
 
   const handleApprove = async () => {
+    const networkState = await Network.getNetworkStateAsync();
+
+    if (!networkState.isConnected || !networkState.isInternetReachable) {
+      Alert.alert('No Internet', 'Please check your network connection and try again.');
+      return;
+    }
+
     const hasBiometrics = await LocalAuthentication.hasHardwareAsync();
     const isEnrolled = await LocalAuthentication.isEnrolledAsync();
 
