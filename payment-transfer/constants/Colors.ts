@@ -27,4 +27,6 @@ export const Colors = {
   background: '#f3f7fb',
   backgroundSection: '#f6efec',
   success: '#37c8c2',
+  disabled: '#c0c0c0',
+  warning: '#d62828',
 };

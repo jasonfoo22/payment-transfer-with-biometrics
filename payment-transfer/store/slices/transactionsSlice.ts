@@ -5,7 +5,7 @@ import { RootState } from '@/store';
 import dayjs from 'dayjs';
 
 interface TransactionsState {
-  user: User | null;
+  user: User;
   transactions: Transaction[];
 }
 

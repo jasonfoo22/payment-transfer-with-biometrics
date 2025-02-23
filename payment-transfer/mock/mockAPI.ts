@@ -9,7 +9,7 @@ export const mockTransferApi = async ({
 }: TransferState): Promise<Transaction> => {
   return new Promise((resolve, reject) => {
     setTimeout(() => {
-      if (Math.random() < 0.1) {
+      if (Math.random() < 0.8) {
         // 80% success rate, adjust this if you want see the API fail
         resolve({
           _id: `${Date.now()}`, // Generate a unique ID

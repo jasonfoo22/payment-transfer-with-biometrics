@@ -19,6 +19,7 @@ import { selectTransferDetail } from '@/store/slices/transferSlice';
 import { mockTransferApi } from '@/mock/mockAPI';
 import { Transaction } from '@/interface/transaction';
 import { Colors } from '@/constants/Colors';
+import { convertCurrencyValue } from '@/utils/currencyFormatter';
 
 export default function Confirmation() {
   const router = useRouter();
@@ -120,7 +121,7 @@ export default function Confirmation() {
           </View>
           <View>
             <Text style={styles.label}>Amount:</Text>
-            <Text style={styles.amount}>RM {amount}</Text>
+            <Text style={styles.amount}>RM {convertCurrencyValue(amount)}</Text>
           </View>
           {notes && (
             <View>

@@ -7,6 +7,8 @@ import { Routes } from '@/constants/Routes';
 import { useDispatch, useSelector } from 'react-redux';
 import { selectTransferDetail, setTransferAmount } from '@/store/slices/transferSlice';
 import { selectUser } from '@/store/slices/transactionsSlice';
+import { Colors } from '@/constants/Colors';
+import { convertCurrencyValue } from '@/utils/currencyFormatter';
 
 export default function SendMoneyScreen() {
   const router = useRouter();
@@ -23,10 +25,6 @@ export default function SendMoneyScreen() {
     return null;
   }
 
-  // Ensure name and phone are always strings
-  const receiverName = transferDetail?.recipient?.name ?? '';
-  const phoneNumber = transferDetail?.recipient?.phone ?? '';
-
   const [amount, setAmount] = useState('');
   const [notes, setNotes] = useState('');
   const [error, setError] = useState<{ amount?: string }>({});
@@ -38,22 +36,22 @@ export default function SendMoneyScreen() {
 
     setError(errors);
     if (Object.keys(errors).length > 0) return;
-
-    // router.push({
-    //   pathname: Routes.transfer.confirmation,
-    //   params: { name: receiverName, phone: phoneNumber, amount, notes },
-    // });
-
-    // Store amount and notes in Redux
     dispatch(setTransferAmount({ amount, notes }));
-
     // Navigate to confirmation screen
     router.push(Routes.transfer.confirmation);
   };
 
   const handleAmountChange = (value: string) => {
     const numericValue = parseInt(value.replace(/\D/g, ''), 10) || 0;
-    setAmount((numericValue / 100).toFixed(2));
+    const amountInCurrencyFormat = (numericValue / 100).toFixed(2);
+    const amountAsNumber = parseFloat(amountInCurrencyFormat);
+
+    if (amountAsNumber > user?.balance) {
+      setError(prev => ({ ...prev, amount: 'Amount exceeds available balance' }));
+    } else {
+      setError(prev => ({ ...prev, amount: undefined }));
+    }
+    setAmount(amountInCurrencyFormat);
   };
 
   return (
@@ -67,8 +65,8 @@ export default function SendMoneyScreen() {
               resizeMode="contain"
             />
             <View style={styles.receiverInfoWrapper}>
-              <Text style={styles.receiverName}>{receiverName}</Text>
-              <Text style={styles.phoneNumber}>{phoneNumber}</Text>
+              <Text style={styles.receiverName}>{transferDetail?.recipient?.name}</Text>
+              <Text style={styles.phoneNumber}>{transferDetail?.recipient?.phone}</Text>
             </View>
           </View>
         }
@@ -84,19 +82,20 @@ export default function SendMoneyScreen() {
                   placeholder="0.00"
                   keyboardType="numeric"
                   inputMode="decimal"
-                  value={amount}
+                  value={convertCurrencyValue(amount)}
                   onChangeText={handleAmountChange}
-                  maxLength={10}
+                  maxLength={14}
                   returnKeyType="done"
                   autoFocus
                 />
               </View>
               {error.amount && <Text style={styles.errorText}>{error.amount}</Text>}
               <View style={styles.balanceAmountWrapper}>
-                <Text style={styles.balanceAmount}>Balance: RM{user?.balance.toFixed(2)}</Text>
+                <Text style={styles.balanceAmount}>
+                  Balance: RM{convertCurrencyValue(user?.balance.toFixed(2))}
+                </Text>
               </View>
             </View>
-
             <View>
               <TextInput
                 style={styles.notesInput}
@@ -110,8 +109,14 @@ export default function SendMoneyScreen() {
             </View>
           </View>
         </View>
-
-        <TouchableOpacity style={styles.sendButton} onPress={handleSendMoney}>
+        <TouchableOpacity
+          style={[
+            styles.sendButton,
+            (!amount || parseFloat(amount) === 0 || error.amount) && styles.disabledButton,
+          ]}
+          disabled={!amount || parseFloat(amount) === 0 || !!error.amount}
+          onPress={handleSendMoney}
+        >
           <Text style={styles.sendButtonText}>Send Money</Text>
         </TouchableOpacity>
       </View>
@@ -160,15 +165,16 @@ const styles = StyleSheet.create({
     fontSize: 32,
   },
   amountInput: {
-    paddingVertical: 10,
     fontSize: 32,
     fontWeight: 'bold',
     elevation: 2,
-    outline: 'none',
+    borderColor: 'transparent',
+    width: '100%',
   },
   balanceAmountWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
+    marginTop: 4,
     gap: 8,
   },
   balanceAmount: {
@@ -176,10 +182,10 @@ const styles = StyleSheet.create({
     color: '#333',
   },
   inputError: {
-    borderColor: 'red',
+    borderColor: Colors.warning,
   },
   errorText: {
-    color: 'red',
+    color: Colors.warning,
     fontSize: 14,
     marginTop: 2,
   },
@@ -195,7 +201,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   sendButton: {
-    backgroundColor: '#5E72E4',
+    backgroundColor: Colors.primary,
     paddingVertical: 15,
     borderRadius: 12,
     alignItems: 'center',
@@ -208,5 +214,8 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#fff',
     textTransform: 'uppercase',
+  },
+  disabledButton: {
+    backgroundColor: Colors.disabled,
   },
 });

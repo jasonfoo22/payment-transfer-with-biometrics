@@ -6,6 +6,8 @@ import { Colors } from '@/constants/Colors';
 import { useDispatch, useSelector } from 'react-redux';
 import { Routes } from '@/constants/Routes';
 import { clearTransfer, selectTransferDetail } from '@/store/slices/transferSlice';
+import { convertCurrencyValue } from '@/utils/currencyFormatter';
+import React from 'react';
 
 export default function SuccessScreen() {
   const router = useRouter();
@@ -28,7 +30,13 @@ export default function SuccessScreen() {
           </View>
         </View>
         <Text style={styles.successText}>Transaction Successful</Text>
-        <Text style={styles.successTextAmount}>RM {amount}</Text>
+        <Text style={styles.successTextAmount}>RM {convertCurrencyValue(amount)}</Text>
+        {notes && (
+          <View>
+            <Text style={styles.label}>Notes:</Text>
+            <Text style={styles.value}>{notes}</Text>
+          </View>
+        )}
         <View style={styles.receiverContainer}>
           <Image
             source={require('@/assets/images/duitnowlogo.png')}
@@ -71,6 +79,15 @@ const styles = StyleSheet.create({
     fontSize: 28,
     fontWeight: 'bold',
     color: '#5E72E4',
+  },
+  label: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#666',
+    marginBottom: 4,
+  },
+  value: {
+    fontSize: 16,
   },
   checkMarkIconWrapper: {
     color: Colors.success,

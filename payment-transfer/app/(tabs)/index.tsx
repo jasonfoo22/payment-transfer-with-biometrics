@@ -9,6 +9,7 @@ import { Colors } from '@/constants/Colors';
 import { useSelector } from 'react-redux';
 import { selectUser } from '@/store/slices/transactionsSlice';
 import { Routes } from '@/constants/Routes';
+import { convertCurrencyValue } from '@/utils/currencyFormatter';
 
 export default function HomeScreen() {
   const user = useSelector(selectUser);
@@ -20,7 +21,7 @@ export default function HomeScreen() {
         <View>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
             <Text style={styles.balance}>
-              {isBalanceHidden ? '*****' : `RM${user?.balance.toFixed(2)}`}
+              {isBalanceHidden ? '*****' : `RM${convertCurrencyValue(user?.balance.toFixed(2))}`}
             </Text>
             <TouchableOpacity onPress={() => setIsBalanceHidden(prev => !prev)}>
               <IconSymbol
@@ -70,8 +71,8 @@ export default function HomeScreen() {
                     color: [TransactionType.RECEIVE_MONEY, TransactionType.TOP_UP].includes(
                       item.type,
                     )
-                      ? 'green'
-                      : 'red',
+                      ? Colors.success
+                      : Colors.warning,
                   },
                 ]}
               >
@@ -79,7 +80,7 @@ export default function HomeScreen() {
                   ? '+'
                   : '-'}{' '}
                 RM
-                {item.amount.toFixed(2)}
+                {convertCurrencyValue(item.amount.toFixed(2))}
               </Text>
             </View>
           )}
