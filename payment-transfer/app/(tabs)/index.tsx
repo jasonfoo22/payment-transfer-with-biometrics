@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, SectionList } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, SectionList, Alert } from 'react-native';
 import dayjs from 'dayjs';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import { Link } from 'expo-router';
@@ -53,6 +53,10 @@ export default function HomeScreen() {
     [transactionsData],
   );
 
+  const handleAddMoney = () => {
+    Alert.alert('Coming Soon', 'This feature is coming soon!', [{ text: 'OK' }]);
+  };
+
   return (
     <ContentLayoutView>
       <View style={styles.headerContainer}>
@@ -75,10 +79,12 @@ export default function HomeScreen() {
 
       <View style={styles.ctaContainer}>
         <View style={styles.ctaBox}>
-          <View style={styles.ctaItem}>
-            <IconSymbol name="plus" size={24} color="black" />
-            <Text style={styles.ctaText}>Add Money</Text>
-          </View>
+          <TouchableOpacity onPress={handleAddMoney}>
+            <View style={styles.ctaItem}>
+              <IconSymbol name="plus" size={24} color="black" />
+              <Text style={styles.ctaText}>Add Money</Text>
+            </View>
+          </TouchableOpacity>
           <Link href={Routes.transfer.selectContact}>
             <View style={styles.ctaItem}>
               <IconSymbol name="paperplane.fill" size={24} color="black" />
