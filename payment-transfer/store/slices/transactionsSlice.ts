@@ -9,13 +9,13 @@ interface TransactionsState {
   transactions: Transaction[];
 }
 
-const sortedTransactions = mockUserData.user.transactions.sort((a, b) =>
-  dayjs(b.createdAt).isAfter(dayjs(a.createdAt)) ? 1 : -1,
-);
+const sortTransactions = (transactions: Transaction[]) => {
+  return transactions.sort((a, b) => (dayjs(b.createdAt).isAfter(dayjs(a.createdAt)) ? 1 : -1));
+};
 
 const initialState: TransactionsState = {
   user: mockUserData.user, // get from mock user data
-  transactions: sortedTransactions,
+  transactions: sortTransactions(mockUserData.user.transactions),
 };
 
 const transactionsSlice = createSlice({
@@ -24,17 +24,30 @@ const transactionsSlice = createSlice({
   reducers: {
     addTransaction: (state, action: PayloadAction<Transaction>) => {
       if (state.user) {
-        // Adjust the balance based on transaction type
-        const newBalance =
-          action.payload.type === TransactionType.SEND_MONEY
-            ? state.user.balance - action.payload.amount
-            : state.user.balance + action.payload.amount;
+        let newBalance = state.user.balance;
 
+        // Adjust the balance based on transaction type using the TransactionType enum values
+        switch (action.payload.type) {
+          case TransactionType.SEND_MONEY:
+            newBalance = Number((state.user.balance - action.payload.amount).toFixed(2)); // Subtract for SEND_MONEY
+            break;
+          case TransactionType.RECEIVE_MONEY:
+          case TransactionType.TOP_UP:
+            newBalance = Number((state.user.balance + action.payload.amount).toFixed(2)); // Add for RECEIVE_MONEY and TOP_UP
+            break;
+          case TransactionType.PAY_BILLS:
+            newBalance = Number((state.user.balance - action.payload.amount).toFixed(2)); // Subtract for PAY_BILLS (or handle differently if needed)
+            break;
+          default:
+            break;
+        }
+
+        // Update the user's balance
         state.user.balance = newBalance;
-        // Add the new transaction and sort the list
-        state.user.transactions = [...state.user.transactions, action.payload].sort((a, b) =>
-          dayjs(b.createdAt).isAfter(dayjs(a.createdAt)) ? 1 : -1,
-        );
+
+        // Add the new transaction and update the transaction list in the correct order
+        const updatedTransactions = [...state.user.transactions, action.payload];
+        state.user.transactions = sortTransactions(updatedTransactions);
       }
     },
   },
