@@ -1,19 +1,55 @@
-import React, { useState } from 'react';
-import { StyleSheet, Text, View, FlatList, TouchableOpacity } from 'react-native';
+import React, { useMemo, useState } from 'react';
+import { StyleSheet, Text, View, TouchableOpacity, SectionList } from 'react-native';
 import dayjs from 'dayjs';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import { Link } from 'expo-router';
 import { ContentLayoutView } from '@/components/ContentLayoutView';
-import { TransactionType } from '@/interface/transaction';
+import { Transaction, TransactionType } from '@/interface/transaction';
 import { Colors } from '@/constants/Colors';
 import { useSelector } from 'react-redux';
 import { selectUser } from '@/store/slices/transactionsSlice';
 import { Routes } from '@/constants/Routes';
 import { convertCurrencyValue } from '@/utils/currencyFormatter';
 
+interface TransactionSection {
+  month: string;
+  data: Transaction[];
+}
+
+const groupTransactionsByMonth = (transactions?: Transaction[]): TransactionSection[] => {
+  if (!transactions) return [];
+  const grouped: Record<string, Transaction[]> = {};
+
+  transactions.forEach(transaction => {
+    const month = dayjs(transaction.createdAt).format('MMM YYYY');
+
+    if (!grouped[month]) {
+      grouped[month] = []; // Ensure the key exists before pushing
+    }
+
+    grouped[month].push(transaction);
+  });
+
+  return Object.keys(grouped).map(month => ({
+    month: month,
+    data: grouped[month],
+  }));
+};
+
+const calculateMonthWidth = (month: string) => {
+  const fontSize = 14;
+  const characterWidth = fontSize * 0.6;
+  return Math.max(month.length * characterWidth + 32, 100);
+};
+
 export default function HomeScreen() {
   const user = useSelector(selectUser);
   const [isBalanceHidden, setIsBalanceHidden] = useState(false);
+
+  const transactionsByMonth = useMemo(
+    () => groupTransactionsByMonth(user?.transactions),
+    [user?.transactions],
+  );
 
   return (
     <ContentLayoutView>
@@ -52,9 +88,21 @@ export default function HomeScreen() {
 
       <View style={styles.transactionContainer}>
         <Text style={styles.sectionTitle}>Transaction History</Text>
-        <FlatList
-          data={user?.transactions}
+        <SectionList
+          sections={transactionsByMonth}
           keyExtractor={item => item._id}
+          renderSectionHeader={({ section: { month } }) => (
+            <View
+              style={[
+                styles.monthHeaderWrapper,
+                {
+                  width: calculateMonthWidth(month),
+                },
+              ]}
+            >
+              <Text style={styles.monthHeader}>{month}</Text>
+            </View>
+          )}
           renderItem={({ item }) => (
             <View style={styles.transactionItem}>
               <View>
@@ -131,6 +179,22 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 10,
+  },
+  monthHeaderWrapper: {
+    alignItems: 'center',
+    borderRadius: 50,
+    marginBottom: 10,
+    marginTop: 4,
+    backgroundColor: Colors.background,
+    minWidth: 100,
+    maxWidth: 240,
+    boxShadow: '2px 2px 6px rgba(0, 0, 0, 0.2)',
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+  },
+  monthHeader: {
+    fontSize: 14,
+    fontWeight: 'bold',
   },
   transactionItem: {
     flexDirection: 'row',
