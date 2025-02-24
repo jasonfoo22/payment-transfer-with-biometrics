@@ -34,10 +34,19 @@ export default function SuccessScreen() {
     { skip: !id },
   );
 
-  // Handle error state
+  // Handle error state when loading completes
   useEffect(() => {
     if (!isLoading) {
-      // Handle case when transaction is not found
+      if (error) {
+        Alert.alert('Error', 'Failed to fetch transaction details. Please try again later.', [
+          {
+            text: 'OK',
+            onPress: () => router.push(Routes.tabs),
+          },
+        ]);
+        return;
+      }
+
       if (!transaction) {
         Alert.alert(
           'Transaction Not Found',
@@ -51,7 +60,7 @@ export default function SuccessScreen() {
         );
       }
     }
-  }, [transaction, router, isLoading]);
+  }, [isLoading, transaction, error, router]);
 
   const backToHome = useCallback(() => {
     dispatch(clearTransfer()); // Clear transfer details

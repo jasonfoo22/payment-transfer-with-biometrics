@@ -3,7 +3,7 @@ import { TopUpMethodType, Transaction, TransactionType, User } from '@/interface
 export const mockUserData: User = {
   _id: '550e8400-e29b-41d4-a716-446655440000',
   name: 'Jason Foo',
-  balance: 5100.4,
+  balance: 6039.28,
 };
 
 export const mockTransactionData: Transaction[] = [
