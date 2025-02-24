@@ -30,3 +30,6 @@ Since the assessment is focused on payment transfers, I decided to concentrate o
 - State Management: Redux
 - UI: React Native
 
+
+https://github.com/user-attachments/assets/e77f65c9-7fe1-4dc5-a4e8-f9b7ef8ff59b
+
