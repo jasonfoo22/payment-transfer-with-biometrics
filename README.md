@@ -1,2 +1,3 @@
 # payment-transfer-with-biometrics
-Payment Transfer Module with Biometrics Authentication
+
+Please go to payment-transfer folder
