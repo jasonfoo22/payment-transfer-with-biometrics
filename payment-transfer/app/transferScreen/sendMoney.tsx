@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { StyleSheet, Text, View, TextInput, TouchableOpacity, Image, Alert } from 'react-native';
+import { StyleSheet, Text, View, TextInput, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
 import { ContentLayoutView } from '@/components/ContentLayoutView';
 import { HeaderWithBackBtn } from '@/components/HeaderWithBackBtn';
@@ -9,6 +9,8 @@ import { selectTransferDetail, setTransferAmount } from '@/store/slices/transfer
 import { Colors } from '@/constants/Colors';
 import { convertCurrencyValue } from '@/utils/currencyFormatter';
 import { selectUser } from '@/store/slices/userSlice';
+import { PaymentTypeDetails } from '@/components/PaymentTypeDetails';
+import { Button } from '@/components/Button';
 
 export default function SendMoneyScreen() {
   const router = useRouter();
@@ -58,17 +60,10 @@ export default function SendMoneyScreen() {
     <ContentLayoutView>
       <HeaderWithBackBtn
         customTitle={
-          <View style={styles.receiverContainer}>
-            <Image
-              source={require('@/assets/images/duitnowlogo.png')}
-              style={styles.logo}
-              resizeMode="contain"
-            />
-            <View style={styles.receiverInfoWrapper}>
-              <Text style={styles.receiverName}>{transferDetail?.recipient?.name}</Text>
-              <Text style={styles.phoneNumber}>{transferDetail?.recipient?.phone}</Text>
-            </View>
-          </View>
+          <PaymentTypeDetails
+            name={transferDetail?.recipient?.name}
+            phone={transferDetail?.recipient?.phone}
+          />
         }
       />
       <View style={styles.formContainer}>
@@ -109,16 +104,12 @@ export default function SendMoneyScreen() {
             </View>
           </View>
         </View>
-        <TouchableOpacity
-          style={[
-            styles.sendButton,
-            (!amount || parseFloat(amount) === 0 || error.amount) && styles.disabledButton,
-          ]}
-          disabled={!amount || parseFloat(amount) === 0 || !!error.amount}
+        <Button
+          title="Send Money"
           onPress={handleSendMoney}
-        >
-          <Text style={styles.sendButtonText}>Send Money</Text>
-        </TouchableOpacity>
+          disabled={!amount || parseFloat(amount) === 0 || !!error.amount}
+          textStyle={styles.sendButtonText}
+        />
       </View>
     </ContentLayoutView>
   );
@@ -130,27 +121,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     marginBottom: 30,
     marginTop: 10,
-  },
-  receiverContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  receiverInfoWrapper: {
-    marginLeft: 10,
-    gap: 4,
-  },
-  logo: {
-    width: 45,
-    height: 45,
-  },
-  receiverName: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#333',
-  },
-  phoneNumber: {
-    fontSize: 16,
-    color: 'gray',
   },
   transactionDetailsContainer: {
     marginBottom: 20,
@@ -200,22 +170,8 @@ const styles = StyleSheet.create({
     borderColor: '#ddd',
     marginTop: 20,
   },
-  sendButton: {
-    backgroundColor: Colors.primary,
-    paddingVertical: 15,
-    borderRadius: 12,
-    alignItems: 'center',
-    elevation: 3,
-    boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.2)',
-    marginHorizontal: 20,
-  },
   sendButtonText: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#fff',
-    textTransform: 'uppercase',
-  },
-  disabledButton: {
-    backgroundColor: Colors.disabled,
   },
 });

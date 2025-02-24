@@ -1,13 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import {
-  StyleSheet,
-  Text,
-  View,
-  TouchableOpacity,
-  Image,
-  Alert,
-  ActivityIndicator,
-} from 'react-native';
+import { StyleSheet, Text, View, Alert, ActivityIndicator } from 'react-native';
 import * as LocalAuthentication from 'expo-local-authentication';
 import { useRouter } from 'expo-router';
 import { ContentLayoutView } from '@/components/ContentLayoutView';
@@ -22,6 +14,8 @@ import { useCreateTransactionMutation } from '@/store/api/transactionApi';
 import * as Network from 'expo-network';
 import { selectUser, updateUserBalance } from '@/store/slices/userSlice';
 import { Transaction, TransactionType } from '@/interface/transaction';
+import { PaymentTypeDetails } from '@/components/PaymentTypeDetails';
+import { Button } from '@/components/Button';
 
 const calculateNewBalance = (transaction: Transaction, currentBalance: number) => {
   let newBalance = currentBalance;
@@ -139,17 +133,7 @@ export default function Confirmation() {
       <View style={styles.container}>
         <View style={styles.detailsContainer}>
           <Text style={styles.label}>Review your transfer</Text>
-          <View style={styles.receiverContainer}>
-            <Image
-              source={require('@/assets/images/duitnowlogo.png')}
-              style={styles.logo}
-              resizeMode="contain"
-            />
-            <View style={styles.receiverInfoWrapper}>
-              <Text style={styles.receiverName}>{recipient?.name}</Text>
-              <Text style={styles.phoneNumber}>{recipient?.phone}</Text>
-            </View>
-          </View>
+          <PaymentTypeDetails name={recipient?.name} phone={recipient?.phone} />
           <View>
             <Text style={styles.label}>Amount:</Text>
             <Text style={styles.amount}>RM {convertCurrencyValue(amount)}</Text>
@@ -164,15 +148,11 @@ export default function Confirmation() {
         {isLoading ? (
           <ActivityIndicator size="large" color={Colors.primary} />
         ) : (
-          <TouchableOpacity
-            style={[styles.button, timeLeft === 0 && styles.disabledButton]}
+          <Button
+            title={`Approve (${Math.floor(timeLeft / 60)}:${(timeLeft % 60).toString().padStart(2, '0')})`}
             onPress={handleApprove}
             disabled={timeLeft === 0}
-          >
-            <Text style={styles.buttonText}>
-              Approve ({Math.floor(timeLeft / 60)}:{(timeLeft % 60).toString().padStart(2, '0')})
-            </Text>
-          </TouchableOpacity>
+          />
         )}
       </View>
     </ContentLayoutView>
@@ -189,27 +169,6 @@ const styles = StyleSheet.create({
   detailsContainer: {
     gap: 20,
   },
-  receiverContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  receiverInfoWrapper: {
-    marginLeft: 10,
-    gap: 4,
-  },
-  logo: {
-    width: 45,
-    height: 45,
-  },
-  receiverName: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#333',
-  },
-  phoneNumber: {
-    fontSize: 16,
-    color: 'gray',
-  },
   label: {
     fontSize: 18,
     fontWeight: 'bold',
@@ -223,21 +182,5 @@ const styles = StyleSheet.create({
     fontSize: 28,
     fontWeight: 'bold',
     color: '#5E72E4',
-  },
-  button: {
-    alignItems: 'center',
-    backgroundColor: Colors.primary,
-    paddingVertical: 15,
-    paddingHorizontal: 40,
-    borderRadius: 12,
-    marginTop: 20,
-  },
-  buttonText: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#fff',
-  },
-  disabledButton: {
-    backgroundColor: '#aaa',
   },
 });

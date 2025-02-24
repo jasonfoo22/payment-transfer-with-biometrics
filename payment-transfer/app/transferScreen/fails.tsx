@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { ContentLayoutView } from '@/components/ContentLayoutView';
 import { IconSymbol } from '@/components/ui/IconSymbol';
@@ -7,6 +7,7 @@ import { useDispatch } from 'react-redux';
 import { Routes } from '@/constants/Routes';
 import { clearTransfer } from '@/store/slices/transferSlice';
 import React, { useCallback } from 'react';
+import { Button } from '@/components/Button';
 
 export default function Fails() {
   const router = useRouter();
@@ -34,14 +35,11 @@ export default function Fails() {
             <Text style={styles.failureText}>Transfer Failed</Text>
           </View>
           <View style={styles.transactionDetailsWrapper}>
-            <Text style={styles.transactionRef}>{errorMessage}</Text>
+            <Text style={styles.message}>{errorMessage}</Text>
           </View>
         </View>
-        <View style={styles.divider} />
-        <TouchableOpacity style={styles.homeBtn} onPress={backToHome}>
-          <Text style={styles.homeText}>Back to Home</Text>
-        </TouchableOpacity>
       </View>
+      <Button title="Back to Home" variant={'warning'} onPress={backToHome} />
     </ContentLayoutView>
   );
 }
@@ -81,28 +79,7 @@ const styles = StyleSheet.create({
     gap: 4,
     marginTop: 12,
   },
-  transactionRef: {
+  message: {
     fontSize: 14,
-  },
-  divider: {
-    width: '100%',
-    height: 1,
-    backgroundColor: '#ccc',
-    marginVertical: 20,
-  },
-  homeBtn: {
-    backgroundColor: Colors.warning,
-    padding: 16,
-    borderRadius: 12,
-    alignItems: 'center',
-    elevation: 3,
-    boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.2)',
-    marginHorizontal: 20,
-  },
-  homeText: {
-    fontSize: 16,
-    fontWeight: 600,
-    color: '#fff',
-    textTransform: 'uppercase',
   },
 });

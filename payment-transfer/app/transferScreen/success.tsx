@@ -1,12 +1,4 @@
-import {
-  StyleSheet,
-  Text,
-  View,
-  Image,
-  TouchableOpacity,
-  ActivityIndicator,
-  Alert,
-} from 'react-native';
+import { StyleSheet, Text, View, ActivityIndicator, Alert } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { ContentLayoutView } from '@/components/ContentLayoutView';
 import { IconSymbol } from '@/components/ui/IconSymbol';
@@ -19,6 +11,8 @@ import React, { useCallback, useEffect } from 'react';
 import dayjs from 'dayjs';
 import { useFetchTransactionDetailsQuery } from '@/store/api/transactionApi';
 import { selectTransactions } from '@/store/slices/transactionsSlice';
+import { PaymentTypeDetails } from '@/components/PaymentTypeDetails';
+import { Button } from '@/components/Button';
 
 export default function SuccessScreen() {
   const router = useRouter();
@@ -43,19 +37,6 @@ export default function SuccessScreen() {
   // Handle error state
   useEffect(() => {
     if (!isLoading) {
-      if (error) {
-        Alert.alert(
-          'Error',
-          'There was an issue fetching transaction details. You will be redirected to the home screen.',
-          [
-            {
-              text: 'OK',
-              onPress: () => router.push(Routes.tabs),
-            },
-          ],
-        );
-      }
-
       // Handle case when transaction is not found
       if (!transaction) {
         Alert.alert(
@@ -70,7 +51,7 @@ export default function SuccessScreen() {
         );
       }
     }
-  }, [error, transaction, router, isLoading]);
+  }, [transaction, router, isLoading]);
 
   const backToHome = useCallback(() => {
     dispatch(clearTransfer()); // Clear transfer details
@@ -114,21 +95,7 @@ export default function SuccessScreen() {
         </View>
         <View style={styles.divider} />
         <View style={styles.transferDetailsWrapper}>
-          <View style={styles.receiverContainer}>
-            <Image
-              source={require('@/assets/images/duitnowlogo.png')}
-              style={styles.logo}
-              resizeMode="contain"
-            />
-            <View style={styles.receiverInfoWrapper}>
-              {transaction?.receiverName && (
-                <Text style={styles.receiverName}>{transaction.receiverName}</Text>
-              )}
-              {transaction?.receiverPhone && (
-                <Text style={styles.phoneNumber}>{transaction.receiverPhone}</Text>
-              )}
-            </View>
-          </View>
+          <PaymentTypeDetails name={transaction?.receiverName} phone={transaction?.receiverPhone} />
           {transaction?.notes && (
             <View>
               <Text style={styles.label}>Notes:</Text>
@@ -137,9 +104,7 @@ export default function SuccessScreen() {
           )}
         </View>
       </View>
-      <TouchableOpacity style={styles.homeBtn} onPress={backToHome} disabled={isLoading}>
-        <Text style={styles.homeText}>Back to Home</Text>
-      </TouchableOpacity>
+      <Button title="Back to Home" onPress={backToHome} />
     </ContentLayoutView>
   );
 }
@@ -222,41 +187,5 @@ const styles = StyleSheet.create({
     padding: 16,
     elevation: 5,
     boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.2)',
-  },
-  receiverContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  receiverInfoWrapper: {
-    marginLeft: 10,
-    gap: 4,
-  },
-  logo: {
-    width: 45,
-    height: 45,
-  },
-  receiverName: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#333',
-  },
-  phoneNumber: {
-    fontSize: 16,
-    color: 'gray',
-  },
-  homeBtn: {
-    backgroundColor: '#5E72E4',
-    paddingVertical: 15,
-    borderRadius: 12,
-    alignItems: 'center',
-    elevation: 3,
-    boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.2)',
-    marginHorizontal: 20,
-  },
-  homeText: {
-    fontSize: 16,
-    fontWeight: 600,
-    color: '#fff',
-    textTransform: 'uppercase',
   },
 });
